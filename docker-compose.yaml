@@ -1,0 +1,17 @@
+version: '3'
+
+networks:
+  desenv-network:
+    driver: bridge
+
+services:
+  entregador:
+    build:
+      context: ./entregador/
+      dockerfile: ./Dockerfile
+    ports:
+      - 8080:8080
+    image: entregador:1.0.0
+    container_name: entregador
+    networks:
+      - desenv-network
