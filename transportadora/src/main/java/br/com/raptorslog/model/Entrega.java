@@ -1,14 +1,16 @@
 package br.com.raptorslog.model;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-
-@Entity
 public class Entrega {
 
-    @Id
     private String id;
     private String name;
+
+    public Entrega(Encomenda encomenda) {
+        this.id = encomenda.getId();
+        this.name = encomenda.getName();
+    }
+
+    public Entrega() {}
 
     public String getId() {
         return id;
