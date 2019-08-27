@@ -20,11 +20,103 @@ help:
 gradleb-entregador:
 	cd ./entregador/ && ./gradlew clean build -Dorg.gradle.java.home=/usr/lib/jvm/java-12-openjdk-amd64/;
 
-# dockerb-entregador:
-#     docker build --force-rm -t entregador:1.0.0 ./entregador/;
+gradleb-loja:
+	cd ./loja/ && ./gradlew clean build -Dorg.gradle.java.home=/usr/lib/jvm/java-12-openjdk-amd64/;
 
-rabbitmq:
-    docker run -d --hostname my-rabbit --name some-rabbit -e RABBITMQ_DEFAULT_USER=guest -e RABBITMQ_DEFAULT_PASS=guest -p 15672:15672 -p 5671-5672:5671-5672 rabbitmq:management-alpine;
+gradleb-transportadora:
+	cd ./transportadora/ && ./gradlew clean build -Dorg.gradle.java.home=/usr/lib/jvm/java-12-openjdk-amd64/;
+
+gradleb-all: gradleb-loja gradleb-transportadora gradleb-entregador
+
+dockerb-rabbitmq:
+	docker build --force-rm -t rabbitmq:1.0.0 ./queue/;
+
+dockerb-entregador: gradleb-entregador
+	docker build --force-rm -t entregador:1.0.0 ./entregador/;
+
+dockerb-loja: gradleb-loja
+	docker build --force-rm -t loja:1.0.0 ./loja/;
+
+dockerb-transportadora: gradleb-transportadora
+	docker build --force-rm -t transportadora:1.0.0 ./transportadora/;
+
+dockerb-all: dockerb-rabbitmq gradleb-loja gradleb-transportadora gradleb-entregador
+
+compose-build: compose-down gradleb-all
+	docker-compose build;
+
+compose-up: compose-down dockerb-all
+	docker-compose up;
+#	docker-compose up -d rabbitmq; \
+#	sleep 40; \
+#	docker-compose up -d loja; \
+#	sleep 20; \
+#	docker-compose up -d transportadora entregador; \
+
+compose-down:
+	docker-compose down;
+
+compose-logs:
+	docker-compose logs -f -t;
+
+health:
+	echo -e "HealthCheck LOJA:\n"; \
+	curl -k http://localhost:8080/actuator/health; \
+	echo -e "\n"; \
+	echo -e "HealthCheck TRANSPORTADORA:\n"; \
+	curl -k http://localhost:8081/actuator/health; \
+	echo -e "\n"; \
+	echo -e "HealthCheck ENTREGADOR:\n"; \
+	curl -k http://localhost:8082/actuator/health; \
+	echo -e "\n"; \
+
+test-raptorslog:
+	while true; do sleep 1; curl -X POST http://localhost:8080/v1/pedido; echo -e '\n';done
+
+rabbitmqrun:
+	docker run -d --network minha-rede --hostname rabbitmq --name rabbitmq -p 15672:15672 -p 5671-5672:5671-5672 rabbitmq:1.0.0
+
+lojarun:
+	docker run -d --network minha-rede --name loja \
+	-e ENV_RABBITMQ_HOST=rabbitmq \
+	-e ENV_RABBITMQ_PORT=5672 \
+	-e ENV_RABBITMQ_USER=guest \
+	-e ENV_RABBITMQ_PASS=guest \
+	-e ENV_QUEUE_NAME=raptorslog.queue \
+	-e ENV_QUEUE_EXCHANGE=raptorslog.exchange \
+	-e ENV_QUEUE_ROUTE_KEY=raptorslog.routingkey \
+	--link rabbitmq:rabbitmq \
+	-p 8080:8090 loja:1.0.0; \
+
+transportadorarun:
+	docker run -d --network minha-rede --name transportadora \
+	-e ENV_RABBITMQ_HOST=rabbitmq \
+	-e ENV_RABBITMQ_PORT=5672 \
+	-e ENV_RABBITMQ_USER=guest \
+	-e ENV_RABBITMQ_PASS=guest \
+	-e ENV_QUEUE_NAME=raptorslog.queue \
+	-e ENV_ENTREGADOR=http://entregador:8070 \
+	--link rabbitmq:rabbitmq \
+	--link entregador:entregador \
+	-p 8081:8080 transportadora:1.0.0; \
+
+entregadorrun:
+	docker run -d --network minha-rede --name entregador \
+	-p 8082:8070 entregador:1.0.0; \
+
+rabbitmq-delete:
+	docker container rm -f rabbitmq;
+
+loja-delete:
+	docker container rm -f loja;
+
+transportadora-delete:
+	docker container rm -f transportadora;
+
+entregador-delete:
+	docker container rm -f entregador;
+
+dockerrmall: rabbitmq-delete loja-delete transportadora-delete entregador-delete
 
 k-setup:
 	minikube -p dev-to start --cpus 2 --memory=4098; \

@@ -5,13 +5,92 @@ networks:
     driver: bridge
 
 services:
+  rabbitmq:
+    build:
+      context: ./queue/
+      dockerfile: ./Dockerfile
+    ports:
+      - 15672:15672
+      - 5671-5672:5671-5672
+    image: rabbitmq:1.0.0
+    container_name: rabbitmq
+    networks:
+      - desenv-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:15672"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+
+  loja:
+    build:
+      context: ./loja/
+      dockerfile: ./Dockerfile
+    environment:
+      - ENV_RABBITMQ_HOST=rabbitmq
+      - ENV_RABBITMQ_PORT=5672
+      - ENV_RABBITMQ_USER=guest
+      - ENV_RABBITMQ_PASS=guest
+      - ENV_QUEUE_NAME=raptorslog.queue
+      - ENV_QUEUE_EXCHANGE=raptorslog.exchange
+      - ENV_QUEUE_ROUTE_KEY=raptorslog.routingkey
+    ports:
+      - 8080:8090
+    image: loja:1.0.0
+    container_name: loja
+    networks:
+      - desenv-network
+    links:
+      - "rabbitmq:rabbitmq"
+    depends_on:
+      - rabbitmq
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8090/actuator/health"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  transportadora:
+    build:
+      context: ./transportadora/
+      dockerfile: ./Dockerfile
+    environment:
+      - ENV_RABBITMQ_HOST=rabbitmq
+      - ENV_RABBITMQ_PORT=5672
+      - ENV_RABBITMQ_USER=guest
+      - ENV_RABBITMQ_PASS=guest
+      - ENV_QUEUE_NAME=raptorslog.queue
+      - ENV_ENTREGADOR=http://entregador:8070
+    ports:
+      - 8081:8080
+    image: transportadora:1.0.0
+    container_name: transportadora
+    networks:
+      - desenv-network
+    links:
+      - "entregador:entregador"
+      - "rabbitmq:rabbitmq"
+    depends_on:
+      - rabbitmq
+      - entregador
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
   entregador:
     build:
       context: ./entregador/
       dockerfile: ./Dockerfile
     ports:
-      - 8080:8080
+      - 8082:8070
     image: entregador:1.0.0
     container_name: entregador
     networks:
       - desenv-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8070/actuator/health"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
