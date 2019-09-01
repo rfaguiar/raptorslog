@@ -1,0 +1,14 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: transportadora-ing
+  namespace: raptorslog
+spec:
+  rules:
+    - host: raptorslog.transportadora.local
+      http:
+        paths:
+          - path: /
+            backend:
+              serviceName: transportadora-svc
+              servicePort: 8080

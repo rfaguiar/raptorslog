@@ -136,17 +136,26 @@ k-ip:
 k-stop:
 	minikube stop;
 
+k-getall:
+	kubectl -n raptorslog get deploy,pod,rc,svc,ing;
+
 k-build-queue:
 	eval $$(minikube -p minikube docker-env) && docker build --force-rm -t rabbitmq:1.0.0 ./queue/;
 
-k-deploy-queue:
+k-deploy-queue: k-build-queue
 	kubectl apply -f kubernetes/queue/;
 
 k-foward-queue:
 	kubectl port-forward -n=raptorslog rabbitmq-97c6d77bb-q8m7p 15672:15672;
 
-k-build-entregador:
+k-build-entregador: gradleb-entregador
 	eval $$(minikube -p minikube docker-env) && docker build --force-rm -t entregador:1.0.0 ./entregador/;
 
-k-deploy-entregador:
+k-deploy-entregador: k-build-entregador
 	kubectl apply -f kubernetes/entregador/;
+
+k-build-transportadora: gradleb-transportadora
+	eval $$(minikube -p minikube docker-env) && docker build --force-rm -t transportadora:1.0.0 ./transportadora/;
+
+k-deploy-transportadora: k-build-transportadora
+	kubectl apply -f kubernetes/transportadora/;
