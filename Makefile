@@ -119,13 +119,28 @@ entregador-delete:
 dockerrmall: rabbitmq-delete loja-delete transportadora-delete entregador-delete
 
 k-setup:
-	minikube -p dev-to start --cpus 2 --memory=4098; \
-	minikube -p dev-to addons enable ingress; \
-	minikube -p dev-to addons enable metrics-server; \
-	kubectl create namespace dev-to; \
+	minikube -p minikube start --cpus 2 --memory=4098; \
+	minikube -p minikube addons enable ingress; \
+	minikube -p minikube addons enable metrics-server; \
+	kubectl create namespace raptorslog; \
+
+k-dashboard:
+	minikube -p minikube dashboard;
 
 k-start:
-	minikube -p dev-to start;
+	minikube start;
+
+k-ip:
+	minikube -p minikube ip
 
 k-stop:
-	minikube -p dev-to stop;
+	minikube stop;
+
+k-build-queue: dockerb-rabbitmq
+	eval $$(minikube -p minikube docker-env) && docker build --force-rm -t rabbitmq:1.0.0 ./queue/;
+
+k-deploy-queue:
+	kubectl apply -f kubernetes/queue/;
+
+k-foward-queue:
+	kubectl port-forward -n=raptorslog rabbitmq-97c6d77bb-q8m7p 15672:15672;

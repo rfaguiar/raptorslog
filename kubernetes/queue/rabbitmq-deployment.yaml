@@ -1,0 +1,33 @@
+apiVersion: apps/v1 # for versions before 1.9.0 use apps/v1beta2
+kind: Deployment
+metadata:
+  name: rabbitmq
+  namespace: raptorslog
+spec:
+  selector:
+    matchLabels:
+      app: rabbitmq
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: rabbitmq
+    spec:
+      containers:
+        - image: rabbitmq:1.0.0
+          name: rabbitmq
+          ports:
+            - containerPort: 15672
+              name: app-port-15672
+            - containerPort: 5671
+              name: queue-port1
+            - containerPort: 5672
+              name: queue-port2
+          readinessProbe:
+            httpGet:
+              path: /
+              port: app-port-15672
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            failureThreshold: 10
