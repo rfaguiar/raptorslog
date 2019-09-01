@@ -1,0 +1,14 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: loja-ing
+  namespace: raptorslog
+spec:
+  rules:
+    - host: raptorslog.loja.local
+      http:
+        paths:
+          - path: /
+            backend:
+              serviceName: loja-svc
+              servicePort: 8090

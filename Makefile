@@ -137,13 +137,16 @@ k-stop:
 	minikube stop;
 
 k-getall:
-	kubectl -n raptorslog get deploy,pod,rc,svc,ing;
+	kubectl -n raptorslog get deploy,rc,rs,pod,svc,ing;
 
 k-build-queue:
 	eval $$(minikube -p minikube docker-env) && docker build --force-rm -t rabbitmq:1.0.0 ./queue/;
 
 k-deploy-queue: k-build-queue
 	kubectl apply -f kubernetes/queue/;
+
+k-delete-queue:
+	kubectl delete -f kubernetes/queue/;
 
 k-foward-queue:
 	kubectl port-forward -n=raptorslog rabbitmq-97c6d77bb-q8m7p 15672:15672;
@@ -154,8 +157,30 @@ k-build-entregador: gradleb-entregador
 k-deploy-entregador: k-build-entregador
 	kubectl apply -f kubernetes/entregador/;
 
+k-delete-entregador:
+	kubectl delete -f kubernetes/entregador/;
+
 k-build-transportadora: gradleb-transportadora
 	eval $$(minikube -p minikube docker-env) && docker build --force-rm -t transportadora:1.0.0 ./transportadora/;
 
 k-deploy-transportadora: k-build-transportadora
 	kubectl apply -f kubernetes/transportadora/;
+
+k-delete-transportadora:
+	kubectl delete -f kubernetes/transportadora/;
+
+k-build-loja: gradleb-loja
+	eval $$(minikube -p minikube docker-env) && docker build --force-rm -t loja:1.0.0 ./loja/;
+
+k-deploy-loja: k-build-loja
+	kubectl apply -f kubernetes/loja/;
+
+k-delete-loja:
+	kubectl delete -f kubernetes/loja/;
+
+k-deployall: k-deploy-queue k-deploy-entregador k-deploy-transportadora k-deploy-loja
+
+k-test-raptorslog:
+	while true; do sleep 1; curl -X POST http://raptorslog.loja.local/v1/pedido; echo -e '\n';done
+
+k-deleteall: k-delete-loja k-delete-transportadora k-delete-queue k-delete-entregador
