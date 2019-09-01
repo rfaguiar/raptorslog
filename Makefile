@@ -136,7 +136,7 @@ k-ip:
 k-stop:
 	minikube stop;
 
-k-build-queue: dockerb-rabbitmq
+k-build-queue:
 	eval $$(minikube -p minikube docker-env) && docker build --force-rm -t rabbitmq:1.0.0 ./queue/;
 
 k-deploy-queue:
@@ -144,3 +144,9 @@ k-deploy-queue:
 
 k-foward-queue:
 	kubectl port-forward -n=raptorslog rabbitmq-97c6d77bb-q8m7p 15672:15672;
+
+k-build-entregador:
+	eval $$(minikube -p minikube docker-env) && docker build --force-rm -t entregador:1.0.0 ./entregador/;
+
+k-deploy-entregador:
+	kubectl apply -f kubernetes/entregador/;

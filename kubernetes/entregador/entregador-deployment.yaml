@@ -1,35 +1,31 @@
 apiVersion: apps/v1 # for versions before 1.9.0 use apps/v1beta2
 kind: Deployment
 metadata:
-  name: rabbitmq
+  name: entregador
   namespace: raptorslog
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: rabbitmq
+      app: entregador
   strategy:
     type: Recreate
   template:
     metadata:
       labels:
-        app: rabbitmq
+        app: entregador
         environment: dev
     spec:
       containers:
-        - image: rabbitmq:1.0.0
-          name: rabbitmq
+        - image: entregador:1.0.0
+          name: entregador
           ports:
-            - containerPort: 15672
-              name: app-port-15672
-            - containerPort: 5671
-              name: queue-port1
-            - containerPort: 5672
-              name: queue-port2
+            - containerPort: 8070
+              name: app-port
           readinessProbe:
             httpGet:
-              path: /
-              port: app-port-15672
+              path: /actuator/health
+              port: app-port
             initialDelaySeconds: 10
             periodSeconds: 10
             failureThreshold: 10
