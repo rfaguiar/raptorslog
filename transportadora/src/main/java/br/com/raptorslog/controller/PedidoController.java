@@ -24,7 +24,7 @@ public class PedidoController {
     }
 
     @PostMapping
-    public ResponseEntity producer(@RequestBody(required = false) Optional<Encomenda> encomenda) {
+    public ResponseEntity producer(@RequestBody Encomenda encomenda) {
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(pedidoService.create(encomenda));

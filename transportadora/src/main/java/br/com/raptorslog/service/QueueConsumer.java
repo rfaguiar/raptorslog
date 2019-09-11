@@ -20,7 +20,7 @@ public class QueueConsumer {
 
     @RabbitListener(queues = "${raptorslog.rabbitmq.queue}")
     public void recievedMessage(Encomenda encomenda) {
-        encomendaService.send(encomenda);
         LOGGER.info("Recieved Message From Queue: {}", encomenda);
+        encomendaService.send(encomenda);
     }
 }
