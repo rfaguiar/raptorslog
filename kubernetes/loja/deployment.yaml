@@ -34,8 +34,20 @@ spec:
               name: app-port
               protocol: TCP
           env:
-            - name: ENV_TRANSPORTADORA
-              value: "http://transportadora-svc:8080"
+            - name: ENV_RABBITMQ_HOST
+              value: "rabbitmq-svc"
+            - name: ENV_RABBITMQ_PORT
+              value: "5672"
+            - name: ENV_RABBITMQ_USER
+              value: "guest"
+            - name: ENV_RABBITMQ_PASS
+              value: "guest"
+            - name: ENV_QUEUE_NAME
+              value: "raptorslog.queue"
+            - name: ENV_QUEUE_EXCHANGE
+              value: "raptorslog.exchange"
+            - name: ENV_QUEUE_ROUTE_KEY
+              value: "raptorslog.routingkey"
           readinessProbe:
             httpGet:
               path: /actuator/health
