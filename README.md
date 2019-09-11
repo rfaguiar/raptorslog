@@ -21,4 +21,10 @@ Projeto de microservices para estudo de service mesh e sidecars com Istio e Envo
 
 * Utilizar minikube na orquestração de microservices.
 
-![Diagram](Diagram-RaptorsLog.png)
+![Diagram](Diagram-RaptorsLog.png)  
+
+# Docs  
+
+https://kubernetes.io/docs/tasks/tools/install-minikube/  
+https://helm.sh/docs/  
+https://istio.io/docs  

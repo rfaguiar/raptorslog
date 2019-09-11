@@ -1,6 +1,9 @@
-apiVersion: apps/v1 # for versions before 1.9.0 use apps/v1beta2
+apiVersion: extensions/v1beta1 # for versions before 1.9.0 use apps/v1beta2
 kind: Deployment
 metadata:
+  labels:
+    app: transportadora
+    version: v1
   name: transportadora
   namespace: raptorslog
 spec:
@@ -8,20 +11,28 @@ spec:
   selector:
     matchLabels:
       app: transportadora
+      version: v1
   strategy:
     type: Recreate
   template:
     metadata:
       labels:
         app: transportadora
+        version: v1
         environment: dev
+      annotations:
+        sidecar.istio.io/inject: "true"
     spec:
       containers:
         - image: transportadora:1.0.0
           name: transportadora
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            privileged: false
           ports:
             - containerPort: 8080
               name: app-port
+              protocol: TCP
           env:
             - name: ENV_RABBITMQ_HOST
               value: "rabbitmq-svc"
@@ -33,6 +44,10 @@ spec:
               value: "guest"
             - name: ENV_QUEUE_NAME
               value: "raptorslog.queue"
+            - name: ENV_QUEUE_EXCHANGE
+              value: "raptorslog.exchange"
+            - name: ENV_QUEUE_ROUTE_KEY
+              value: "raptorslog.routingkey"
             - name: ENV_ENTREGADOR
               value: "http://entregador-svc:8070"
           readinessProbe:

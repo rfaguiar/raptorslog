@@ -1,6 +1,9 @@
-apiVersion: apps/v1 # for versions before 1.9.0 use apps/v1beta2
+apiVersion: extensions/v1beta1 # for versions before 1.9.0 use apps/v1beta2
 kind: Deployment
 metadata:
+  labels:
+    app: rabbitmq
+    version: v1
   name: rabbitmq
   namespace: raptorslog
 spec:
@@ -8,24 +11,37 @@ spec:
   selector:
     matchLabels:
       app: rabbitmq
+      version: v1
   strategy:
     type: Recreate
   template:
     metadata:
       labels:
         app: rabbitmq
+        version: v1
         environment: dev
+      annotations:
+        sidecar.istio.io/inject: "true"
     spec:
       containers:
         - image: rabbitmq:1.0.0
           name: rabbitmq
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            privileged: false
           ports:
             - containerPort: 15672
               name: app-port-15672
+              protocol: TCP
             - containerPort: 5671
               name: queue-port1
+              protocol: TCP
             - containerPort: 5672
               name: queue-port2
+              protocol: TCP
+            - containerPort: 4369 # don't touch this config
+              name: epmd # don't touch this config
+              protocol: TCP
           readinessProbe:
             httpGet:
               path: /

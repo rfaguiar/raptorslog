@@ -1,0 +1,34 @@
+#apiVersion: networking.istio.io/v1alpha3
+#kind: Gateway
+#metadata:
+#  name: rabbitmq-gateway
+#  namespace: raptorslog
+#spec:
+#  selector:
+#    istio: ingressgateway # use istio default controller
+#  servers:
+#    - port:
+#        number: 80
+#        name: http
+#        protocol: HTTP
+#      hosts:
+#        - "*"
+#---
+#apiVersion: networking.istio.io/v1alpha3
+#kind: VirtualService
+#metadata:
+#  name: rabbitmq-gateway
+#  namespace: raptorslog
+#spec:
+#  hosts:
+#    - "*"
+#  gateways:
+#    - rabbitmq-gateway
+#  http:
+#    - match:
+#        - port: 15672
+#      route:
+#        - destination:
+#            host: rabbitmq-svc
+#            port:
+#              number: 15672

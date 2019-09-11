@@ -51,7 +51,7 @@ compose-up: compose-down dockerb-all
 #	sleep 40; \
 #	docker-compose up -d loja; \
 #	sleep 20; \
-#	docker-compose up -d transportadora entregador; \
+#	docker-compose up -d transportadora entregador;
 
 compose-down:
 	docker-compose down;
@@ -68,7 +68,7 @@ health:
 	echo -e "\n"; \
 	echo -e "HealthCheck ENTREGADOR:\n"; \
 	curl -k http://localhost:8082/actuator/health; \
-	echo -e "\n"; \
+	echo -e "\n";
 
 test-raptorslog:
 	while true; do sleep 1; curl -X POST http://localhost:8080/v1/pedido; echo -e '\n';done
@@ -86,7 +86,7 @@ lojarun:
 	-e ENV_QUEUE_EXCHANGE=raptorslog.exchange \
 	-e ENV_QUEUE_ROUTE_KEY=raptorslog.routingkey \
 	--link rabbitmq:rabbitmq \
-	-p 8080:8090 loja:1.0.0; \
+	-p 8080:8090 loja:1.0.0;
 
 transportadorarun:
 	docker run -d --network minha-rede --name transportadora \
@@ -98,11 +98,11 @@ transportadorarun:
 	-e ENV_ENTREGADOR=http://entregador:8070 \
 	--link rabbitmq:rabbitmq \
 	--link entregador:entregador \
-	-p 8081:8080 transportadora:1.0.0; \
+	-p 8081:8080 transportadora:1.0.0;
 
 entregadorrun:
 	docker run -d --network minha-rede --name entregador \
-	-p 8082:8070 entregador:1.0.0; \
+	-p 8082:8070 entregador:1.0.0;
 
 rabbitmq-delete:
 	docker container rm -f rabbitmq;
@@ -118,11 +118,28 @@ entregador-delete:
 
 dockerrmall: rabbitmq-delete loja-delete transportadora-delete entregador-delete
 
+# export ISTIO_HOME=`pwd`/istio-1.2.5
+# export PATH=$ISTIO_HOME/bin:$PATH
+
 k-setup:
-	minikube -p minikube start --cpus 2 --memory=4098; \
+	minikube -p minikube start --cpus 2 --memory=8192; \
 	minikube -p minikube addons enable ingress; \
 	minikube -p minikube addons enable metrics-server; \
 	kubectl create namespace raptorslog; \
+	kubectl config set-context $(kubectl config current-context) --namespace=raptorslog;
+
+k-istio-setup:
+	for i in istio-1.2.5/install/kubernetes/helm/istio-init/files/crd*yaml; do kubectl apply -f $i; done; \
+	kubectl apply -f istio-1.2.5/install/kubernetes/istio-demo.yaml;
+
+k-expose-telemetry:
+	kubectl apply -f istio-1.2.5/install/kubernetes/grafana-ingress.yaml; \
+	kubectl apply -f istio-1.2.5/install/kubernetes/kiali-ingress.yaml; \
+	kubectl apply -f istio-1.2.5/install/kubernetes/prometheus-ingress.yaml; \
+	kubectl apply -f istio-1.2.5/install/kubernetes/jaeger-ingress.yaml;
+
+#k-inject-istio:
+#	kubectl label namespace raptorslog istio-injection=enabled;
 
 k-dashboard:
 	minikube -p minikube dashboard;
@@ -143,7 +160,11 @@ k-build-queue:
 	eval $$(minikube -p minikube docker-env) && docker build --force-rm -t rabbitmq:1.0.0 ./queue/;
 
 k-deploy-queue: k-build-queue
-	kubectl apply -f kubernetes/queue/;
+	kubectl apply -f kubernetes/queue/policy-istio.yaml
+	kubectl apply -f <(istioctl kube-inject -f kubernetes/queue/rabbitmq-deployment.yaml)
+	kubectl apply -f kubernetes/queue/rabbitmq-service.yaml
+	sleep 30; \
+#	kubectl apply -f kubernetes/queue/;
 
 k-delete-queue:
 	kubectl delete -f kubernetes/queue/;
@@ -155,7 +176,11 @@ k-build-entregador: gradleb-entregador
 	eval $$(minikube -p minikube docker-env) && docker build --force-rm -t entregador:1.0.0 ./entregador/;
 
 k-deploy-entregador: k-build-entregador
-	kubectl apply -f kubernetes/entregador/;
+	kubectl apply -f <(istioctl kube-inject -f kubernetes/entregador/deployment.yaml)
+	kubectl apply -f kubernetes/entregador/service.yaml
+#	kubectl apply -f kubernetes/entregador/gateway.yaml
+#	kubectl apply -f kubernetes/entregador/ingress.yaml
+#	kubectl apply -f kubernetes/entregador/;
 
 k-delete-entregador:
 	kubectl delete -f kubernetes/entregador/;
@@ -164,7 +189,11 @@ k-build-transportadora: gradleb-transportadora
 	eval $$(minikube -p minikube docker-env) && docker build --force-rm -t transportadora:1.0.0 ./transportadora/;
 
 k-deploy-transportadora: k-build-transportadora
-	kubectl apply -f kubernetes/transportadora/;
+	kubectl apply -f <(istioctl kube-inject -f kubernetes/transportadora/deployment.yaml)
+	kubectl apply -f kubernetes/transportadora/service.yaml
+#	kubectl apply -f kubernetes/transportadora/gateway.yaml
+#	kubectl apply -f kubernetes/transportadora/ingress.yaml
+#	kubectl apply -f kubernetes/transportadora/;
 
 k-delete-transportadora:
 	kubectl delete -f kubernetes/transportadora/;
@@ -173,14 +202,21 @@ k-build-loja: gradleb-loja
 	eval $$(minikube -p minikube docker-env) && docker build --force-rm -t loja:1.0.0 ./loja/;
 
 k-deploy-loja: k-build-loja
-	kubectl apply -f kubernetes/loja/;
+	kubectl apply -f <(istioctl kube-inject -f kubernetes/loja/deployment.yaml)
+	kubectl apply -f kubernetes/loja/service.yaml
+	kubectl apply -f kubernetes/loja/gateway.yaml
+	kubectl apply -f kubernetes/loja/ingress.yaml
+#	kubectl apply -f kubernetes/loja/;
 
 k-delete-loja:
 	kubectl delete -f kubernetes/loja/;
 
-k-deployall: k-deploy-queue k-deploy-entregador k-deploy-transportadora k-deploy-loja
+k-deployall: k-deploy-queue k-deploy-entregador k-deploy-loja k-deploy-transportadora
 
 k-test-raptorslog:
 	while true; do sleep 1; curl -X POST http://raptorslog.loja.local/v1/pedido; echo -e '\n';done
 
-k-deleteall: k-delete-loja k-delete-transportadora k-delete-queue k-delete-entregador
+k-deleteall: k-delete-loja k-delete-transportadora k-delete-entregador k-delete-queue
+
+k-show-istio:
+	kubectl get deploy,svc,pod -n istio-system; \

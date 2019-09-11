@@ -1,14 +1,16 @@
-apiVersion: extensions/v1beta1
-kind: Ingress
-metadata:
-  name: rabbitmq-ing
-  namespace: raptorslog
-spec:
-  rules:
-    - host: raptorslog.rabbitmq.local
-      http:
-        paths:
-          - path: /
-            backend:
-              serviceName: rabbitmq-svc
-              servicePort: 15672
+#apiVersion: extensions/v1beta1
+#kind: Ingress
+#metadata:
+#  labels:
+#    app: rabbitmq
+#  name: rabbitmq-ing
+#  namespace: raptorslog
+#spec:
+#  rules:
+#    - host: raptorslog.rabbitmq.local
+#      http:
+#        paths:
+#          - path: /
+#            backend:
+#              serviceName: rabbitmq-svc
+#              servicePort: 15672
