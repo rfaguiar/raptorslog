@@ -86,7 +86,7 @@ services:
       - ENV_RABBITMQ_USER=guest
       - ENV_RABBITMQ_PASS=guest
       - ENV_QUEUE_NAME=raptorslog.queue
-      - ENV_ENTREGADOR=http://entregador:8070
+      - ENV_ENTREGADOR_RS=http://entregador-rs:8070
       - ENV_ENTREGADOR_AM=http://entregado-am:8071
       - ENV_ENTREGADOR_MG=http://entregado-am:8072
     ports:
@@ -96,13 +96,13 @@ services:
     networks:
       - desenv-network
     links:
-      - "entregador:entregador"
+      - "entregador-rs:entregador-rs"
       - "entregador-am:entregador-am"
       - "entregador-mg:entregador-mg"
       - "rabbitmq:rabbitmq"
     depends_on:
       - rabbitmq
-      - entregador
+      - entregador-rs
       - entregador-am
       - entregador-mg
     healthcheck:
@@ -111,14 +111,14 @@ services:
       timeout: 5s
       retries: 5
 
-  entregador:
+  entregador-rs:
     build:
-      context: ./entregador/
+      context: ./entregador-RS/
       dockerfile: ./Dockerfile
     ports:
       - 8082:8070
     image: entregador:1.0.0
-    container_name: entregador
+    container_name: entregador-rs
     networks:
       - desenv-network
     healthcheck:

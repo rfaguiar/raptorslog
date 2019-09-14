@@ -8,17 +8,13 @@ help:
 	echo "Use make [rule]"
 	echo "Rules:"
 	echo ""
-	echo "gradleb-entregador     - build application using gradlew wrapper with openjdk version 12 local machine"
-	echo ""
-	echo "dockerb-entregador     - build application and generate docker image"
-	echo ""
 	echo "dockerr-rabbitmq       - This will start a RabbitMQ container listening on the default port of 5672. web-browser port 15672 and pluguins: rabbitmq_management rabbitmq_web_dispatch rabbitmq_management_agent"
 	echo ""
 	echo "k-start		         - start minikube machine"
 	echo "k-stop		         - stop minikube machine"
 
-gradleb-entregador:
-	cd ./entregador/ && ./gradlew clean build -Dorg.gradle.java.home=/usr/lib/jvm/java-12-openjdk-amd64/;
+gradleb-entregador-RS:
+	cd ./entregador-RS/ && ./gradlew clean build -Dorg.gradle.java.home=/usr/lib/jvm/java-12-openjdk-amd64/;
 
 gradleb-entregador-AM:
 	cd ./entregador-AM/ && ./gradlew clean build -Dorg.gradle.java.home=/usr/lib/jvm/java-12-openjdk-amd64/;
@@ -35,13 +31,13 @@ gradleb-transportadora:
 gradleb-transportadora-dispatcher:
 	cd ./transportadora-dispatcher/ && ./gradlew clean build -Dorg.gradle.java.home=/usr/lib/jvm/java-12-openjdk-amd64/;
 
-gradleb-all: gradleb-loja gradleb-entregador gradleb-entregador-AM gradleb-entregador-MG gradleb-transportadora gradleb-transportadora-dispatcher
+gradleb-all: gradleb-loja gradleb-entregador-RS gradleb-entregador-AM gradleb-entregador-MG gradleb-transportadora gradleb-transportadora-dispatcher
 
 dockerb-rabbitmq:
 	docker build --force-rm -t rabbitmq:1.0.0 ./queue/;
 
-dockerb-entregador: gradleb-entregador
-	docker build --force-rm -t entregador:1.0.0 ./entregador/;
+dockerb-entregador-RS: gradleb-entregador-RS
+	docker build --force-rm -t entregador-rs:1.0.0 ./entregador-RS/;
 
 dockerb-entregador-AM: gradleb-entregador-AM
 	docker build --force-rm -t entregador-am:1.0.0 ./entregador-AM/;
@@ -58,7 +54,7 @@ dockerb-transportadora: gradleb-transportadora
 dockerb-transportadora-dispatcher: gradleb-transportadora-dispatcher
 	docker build --force-rm -t transportadora-dispatcher:1.0.0 ./transportadora-dispatcher/;
 
-dockerb-all: dockerb-rabbitmq gradleb-loja dockerb-entregador dockerb-entregador-AM dockerb-entregador-MG dockerb-transportadora dockerb-transportadora-dispatcher
+dockerb-all: dockerb-rabbitmq gradleb-loja dockerb-entregador-RS dockerb-entregador-AM dockerb-entregador-MG dockerb-transportadora dockerb-transportadora-dispatcher
 
 compose-build: compose-down gradleb-all
 	docker-compose build;
@@ -82,7 +78,7 @@ health:
 	echo -e "HealthCheck TRANSPORTADORA-DISPATCHER:\n"; \
 	curl -k http://localhost:8083/actuator/health; \
 	echo -e "\n"; \
-	echo -e "HealthCheck ENTREGADOR:\n"; \
+	echo -e "HealthCheck ENTREGADOR-RS:\n"; \
 	curl -k http://localhost:8082/actuator/health; \
 	echo -e "\n"\
 	echo -e "HealthCheck ENTREGADOR-AM:\n"; \
@@ -127,22 +123,23 @@ transportadora-dispatcherrun:
 	-e ENV_RABBITMQ_USER=guest \
 	-e ENV_RABBITMQ_PASS=guest \
 	-e ENV_QUEUE_NAME=raptorslog.queue \
-	-e ENV_ENTREGADOR=http://entregador:8070 \
+	-e ENV_ENTREGADOR_RS=http://entregador:8070 \
 	-e ENV_ENTREGADOR_AM=http://entregador:8071 \
+	-e ENV_ENTREGADOR_MG=http://entregador:8072 \
 	--link rabbitmq:rabbitmq \
 	--link entregador:entregador \
 	-p 8083:8080 transportadora-dispatcher:1.0.0;
 
-entregadorrun:
-	docker run -d --network minha-rede --name entregador \
-	-p 8082:8070 entregador:1.0.0;
+entregador-RSrun:
+	docker run -d --network minha-rede --name entregador-rs \
+	-p 8082:8070 entregador-rs:1.0.0;
 
 entregador-AMrun:
-	docker run -d --network minha-rede --name entregador-AM \
+	docker run -d --network minha-rede --name entregador-am \
 	-p 8084:8071 entregador-am:1.0.0;
 
 entregador-MGrun:
-	docker run -d --network minha-rede --name entregador-MG \
+	docker run -d --network minha-rede --name entregador-mg \
 	-p 8085:8072 entregador-mg:1.0.0;
 
 rabbitmq-delete:
@@ -157,16 +154,16 @@ transportadora-delete:
 transportadora-dispatcher-delete:
 	docker container rm -f transportadora-dispatcher;
 
-entregador-delete:
-	docker container rm -f entregador;
+entregador-RS-delete:
+	docker container rm -f entregador-rs;
 
 entregador-AM-delete:
-	docker container rm -f entregador-AM;
+	docker container rm -f entregador-am;
 
 entregador-MG-delete:
-	docker container rm -f entregador-MG;
+	docker container rm -f entregador-mg;
 
-dockerrmall: rabbitmq-delete loja-delete transportadora-delete transportadora-dispatcher-delete entregador-delete entregador-AM-delete entregador-MG-delete
+dockerrmall: rabbitmq-delete loja-delete transportadora-delete transportadora-dispatcher-delete entregador-RS-delete entregador-AM-delete entregador-MG-delete
 
 # export ISTIO_HOME=`pwd`/istio-1.2.5
 # export PATH=$ISTIO_HOME/bin:$PATH
@@ -223,18 +220,18 @@ k-delete-queue:
 k-foward-queue:
 	kubectl port-forward -n=raptorslog rabbitmq-97c6d77bb-q8m7p 15672:15672;
 
-k-build-entregador: gradleb-entregador
-	eval $$(minikube -p minikube docker-env) && docker build --force-rm -t entregador:1.0.0 ./entregador/;
+k-build-entregador-RS: gradleb-entregador-RS
+	eval $$(minikube -p minikube docker-env) && docker build --force-rm -t entregador-rs:1.0.0 ./entregador-RS/;
 
-k-deploy-entregador: k-build-entregador
-	kubectl apply -f <(istioctl kube-inject -f kubernetes/entregador/deployment.yaml)
-	kubectl apply -f kubernetes/entregador/service.yaml
-#	kubectl apply -f kubernetes/entregador/gateway.yaml
-#	kubectl apply -f kubernetes/entregador/ingress.yaml
-#	kubectl apply -f kubernetes/entregador/;
+k-deploy-entregador-RS: k-build-entregador-RS
+	kubectl apply -f <(istioctl kube-inject -f kubernetes/entregador-RS/deployment.yaml)
+	kubectl apply -f kubernetes/entregador-RS/service.yaml
+#	kubectl apply -f kubernetes/entregador-RS/gateway.yaml
+#	kubectl apply -f kubernetes/entregador-RS/ingress.yaml
+#	kubectl apply -f kubernetes/entregador-RS/;
 
-k-delete-entregador:
-	kubectl delete -f kubernetes/entregador/;
+k-delete-entregador-RS:
+	kubectl delete -f kubernetes/entregador-RS/;
 
 k-build-entregador-AM: gradleb-entregador-AM
 	eval $$(minikube -p minikube docker-env) && docker build --force-rm -t entregador-am:1.0.0 ./entregador-AM/;
@@ -305,13 +302,13 @@ k-expose-loja:
 k-delete-loja:
 	kubectl delete -f kubernetes/loja/;
 
-k-deployall: k-deploy-queue k-deploy-entregador k-deploy-entregador-AM k-deploy-entregador-MG k-deploy-loja k-deploy-transportadora k-deploy-transportadora-dispatcher
+k-deployall: k-deploy-queue k-deploy-entregador-RS k-deploy-entregador-AM k-deploy-entregador-MG k-deploy-loja k-deploy-transportadora k-deploy-transportadora-dispatcher
 
 k-test-raptorslog:
 	while true; do sleep 1; curl -X POST http://$$(minikube -p minikube ip):31930/v1/pedido; echo -e '\n';done
 #	while true; do sleep 1; curl -X POST http://raptorslog.loja.local/v1/pedido; echo -e '\n';done
 
-k-deleteall: k-delete-loja k-delete-transportadora k-delete-entregador k-delete-entregador-AM k-delete-entregador-MG k-delete-queue
+k-deleteall: k-delete-loja k-delete-transportadora k-delete-entregador-RS k-delete-entregador-AM k-delete-entregador-MG k-delete-queue
 
 k-show-istio:
 	kubectl get deploy,svc,pod -n istio-system; \

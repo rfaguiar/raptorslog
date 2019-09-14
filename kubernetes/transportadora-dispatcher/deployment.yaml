@@ -48,8 +48,8 @@ spec:
               value: "raptorslog.exchange"
             - name: ENV_QUEUE_ROUTE_KEY
               value: "raptorslog.routingkey"
-            - name: ENV_ENTREGADOR
-              value: "http://entregador-svc:8070"
+            - name: ENV_ENTREGADOR_RS
+              value: "http://entregador-rs-svc:8070"
             - name: ENV_ENTREGADOR_AM
               value: "http://entregador-am-svc:8071"
             - name: ENV_ENTREGADOR_MG
