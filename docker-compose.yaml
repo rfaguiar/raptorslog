@@ -88,6 +88,7 @@ services:
       - ENV_QUEUE_NAME=raptorslog.queue
       - ENV_ENTREGADOR=http://entregador:8070
       - ENV_ENTREGADOR_AM=http://entregado-am:8071
+      - ENV_ENTREGADOR_MG=http://entregado-am:8072
     ports:
       - 8083:8081
     image: transportadora-dispatcher:1.0.0
@@ -97,11 +98,13 @@ services:
     links:
       - "entregador:entregador"
       - "entregador-am:entregador-am"
+      - "entregador-mg:entregador-mg"
       - "rabbitmq:rabbitmq"
     depends_on:
       - rabbitmq
       - entregador
       - entregador-am
+      - entregador-mg
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8081/actuator/health"]
       interval: 5s

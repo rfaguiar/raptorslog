@@ -52,6 +52,8 @@ spec:
               value: "http://entregador-svc:8070"
             - name: ENV_ENTREGADOR_AM
               value: "http://entregador-am-svc:8071"
+            - name: ENV_ENTREGADOR_MG
+              value: "http://entregador-mg-svc:8072"
           readinessProbe:
             httpGet:
               path: /actuator/health

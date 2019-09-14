@@ -5,6 +5,7 @@ import br.com.raptorslog.model.Entrega;
 import br.com.raptorslog.model.Estado;
 import br.com.raptorslog.repository.Entregador;
 import br.com.raptorslog.repository.EntregadorAM;
+import br.com.raptorslog.repository.EntregadorMG;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,27 +18,32 @@ public class EncomendaService {
     private static final Logger LOGGER = LoggerFactory.getLogger(EncomendaService.class);
     private Entregador entregador;
     private EntregadorAM entregadorAM;
+    private EntregadorMG entregadorMG;
 
     @Autowired
-    public EncomendaService(Entregador entregador, EntregadorAM entregadorAM) {
+    public EncomendaService(Entregador entregador,
+                            EntregadorAM entregadorAM,
+                            EntregadorMG entregadorMG) {
         this.entregador = entregador;
         this.entregadorAM = entregadorAM;
+        this.entregadorMG = entregadorMG;
     }
 
     public void send(Encomenda encomenda) {
-        ResponseEntity send = sendEncomenda(encomenda);
+        ResponseEntity send = sendToState(encomenda);
         LOGGER.info("Dispatched: {}\n{}\n{}",
                 send.getBody(),
                 send.getStatusCodeValue(),
                 send.getHeaders().entrySet());
     }
 
-    private ResponseEntity sendEncomenda(Encomenda encomenda) {
+    private ResponseEntity sendToState(Encomenda encomenda) {
         Entrega entrega = new Entrega(encomenda);
-        if (Estado.AM.equals(encomenda.getEstado())) {
-            return entregadorAM.send(entrega);
+        switch (encomenda.getEstado()) {
+            case MG: return entregadorMG.send(entrega);
+            case AM: return entregadorAM.send(entrega);
+            default: return entregador.send(entrega);
         }
-        return entregador.send(entrega);
     }
 
 }
