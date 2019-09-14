@@ -1,0 +1,16 @@
+#apiVersion: extensions/v1beta1
+#kind: Ingress
+#metadata:
+#  name: entregador-am-ing
+#  namespace: raptorslog
+#  labels:
+#    app: entregador-am
+#spec:
+#  rules:
+#    - host: raptorslog.entregador-am.local
+#      http:
+#        paths:
+#          - path: /
+#            backend:
+#              serviceName: entregador-am-svc
+#              servicePort: 8071

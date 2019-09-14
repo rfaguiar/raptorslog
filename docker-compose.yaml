@@ -120,3 +120,19 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+
+  entregador-am:
+    build:
+      context: ./entregador-AM/
+      dockerfile: ./Dockerfile
+    ports:
+      - 8084:8071
+    image: entregador:1.0.0
+    container_name: entregador-am
+    networks:
+      - desenv-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8071/actuator/health"]
+      interval: 5s
+      timeout: 5s
+      retries: 5

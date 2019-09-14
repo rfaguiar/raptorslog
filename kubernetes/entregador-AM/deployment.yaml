@@ -1,0 +1,42 @@
+apiVersion: extensions/v1beta1 # for versions before 1.9.0 use apps/v1beta2
+kind: Deployment
+metadata:
+  labels:
+    app: entregador-am
+    version: v1
+  name: entregador-am
+  namespace: raptorslog
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: entregador-am
+      version: v1
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: entregador-am
+        version: v1
+        environment: dev
+      annotations:
+        sidecar.istio.io/inject: "true"
+    spec:
+      containers:
+        - image: entregador-am:1.0.0
+          name: entregador-am
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            privileged: false
+          ports:
+            - containerPort: 8071
+              name: app-port
+              protocol: TCP
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: app-port
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            failureThreshold: 10
