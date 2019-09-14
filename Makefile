@@ -119,6 +119,7 @@ transportadora-dispatcherrun:
 	-e ENV_RABBITMQ_PASS=guest \
 	-e ENV_QUEUE_NAME=raptorslog.queue \
 	-e ENV_ENTREGADOR=http://entregador:8070 \
+	-e ENV_ENTREGADOR_AM=http://entregador:8071 \
 	--link rabbitmq:rabbitmq \
 	--link entregador:entregador \
 	-p 8083:8080 transportadora-dispatcher:1.0.0;
