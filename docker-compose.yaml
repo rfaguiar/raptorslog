@@ -76,6 +76,35 @@ services:
       timeout: 5s
       retries: 5
 
+  transportadora-consumer:
+    build:
+      context: ./transportadora-consumer/
+      dockerfile: ./Dockerfile
+    environment:
+      - ENV_RABBITMQ_HOST=rabbitmq
+      - ENV_RABBITMQ_PORT=5672
+      - ENV_RABBITMQ_USER=guest
+      - ENV_RABBITMQ_PASS=guest
+      - ENV_QUEUE_NAME=raptorslog.queue
+      - ENV_TRANSPORTADORA_DISPATCHER=http://transportadora-dispatcher:8083
+    ports:
+      - 8086:8080
+    image: transportadora-consumer:1.0.0
+    container_name: transportadora-consumer
+    networks:
+      - desenv-network
+    links:
+      - "rabbitmq:rabbitmq"
+      - "transportadora-dispatcher:transportadora-dispatcher"
+    depends_on:
+      - rabbitmq
+      - transportadora-dispatcher
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
   transportadora-dispatcher:
     build:
       context: ./transportadora-dispatcher/

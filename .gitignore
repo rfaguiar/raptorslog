@@ -32,6 +32,7 @@ out/
 .vscode/
 /.gradle/
 /transportadora/.gradle/
+/transportadora-consumer/.gradle/
 /transportadora-dispatcher/.gradle/
 /loja/.gradle/
 /entregador-AM/.gradle
