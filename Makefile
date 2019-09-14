@@ -149,7 +149,7 @@ transportadora-dispatcherrun: dockerb-transportadora-dispatcher
 	-e ENV_ENTREGADOR_MG=http://entregador:8072 \
 	--link rabbitmq:rabbitmq \
 	--link entregador:entregador \
-	-p 8083:8080 transportadora-dispatcher:1.0.0;
+	-p 8083:8082 transportadora-dispatcher:1.0.0;
 
 entregador-RSrun: dockerb-entregador-RS
 	docker run -d --network minha-rede --name entregador-rs \
@@ -301,7 +301,7 @@ k-build-transportadora-consumer: gradleb-transportadora-consumer
 
 k-deploy-transportadora-consumer: k-build-transportadora-consumer
 	kubectl apply -f <(istioctl kube-inject -f kubernetes/transportadora-consumer/deployment.yaml)
-	kubectl apply -f kubernetes/transportadora-consumer/service.yaml
+#	kubectl apply -f kubernetes/transportadora-consumer/service.yaml
 #	kubectl apply -f kubernetes/transportadora/gateway.yaml
 #	kubectl apply -f kubernetes/transportadora/ingress.yaml
 #	kubectl apply -f kubernetes/transportadora/;
@@ -314,7 +314,7 @@ k-build-transportadora-dispatcher: gradleb-transportadora-dispatcher
 
 k-deploy-transportadora-dispatcher: k-build-transportadora-dispatcher
 	kubectl apply -f <(istioctl kube-inject -f kubernetes/transportadora-dispatcher/deployment.yaml)
-#	kubectl apply -f kubernetes/transportadora-dispatcher/service.yaml
+	kubectl apply -f kubernetes/transportadora-dispatcher/service.yaml
 #	kubectl apply -f kubernetes/transportadora-dispatcher/gateway.yaml
 #	kubectl apply -f kubernetes/transportadora-dispatcher/ingress.yaml
 #	kubectl apply -f kubernetes/transportadora-dispatcher/;
@@ -339,7 +339,7 @@ k-expose-loja:
 k-delete-loja:
 	kubectl delete -f kubernetes/loja/;
 
-k-deployall: k-deploy-queue k-deploy-entregador-RS k-deploy-entregador-AM k-deploy-entregador-MG k-deploy-loja k-deploy-transportadora k-deploy-transportadora-dispatcher
+k-deployall: k-deploy-queue k-deploy-entregador-RS k-deploy-entregador-AM k-deploy-entregador-MG k-deploy-loja k-deploy-transportadora k-deploy-transportadora-consumer k-deploy-transportadora-dispatcher
 
 k-test-raptorslog:
 	while true; do sleep 1; curl -X POST http://$$(minikube -p minikube ip):31930/v1/pedido; echo -e '\n';done

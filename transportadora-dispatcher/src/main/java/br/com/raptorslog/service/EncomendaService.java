@@ -2,6 +2,7 @@ package br.com.raptorslog.service;
 
 import br.com.raptorslog.model.Encomenda;
 import br.com.raptorslog.model.Entrega;
+import br.com.raptorslog.model.Message;
 import br.com.raptorslog.repository.EntregadorRS;
 import br.com.raptorslog.repository.EntregadorAM;
 import br.com.raptorslog.repository.EntregadorMG;
@@ -28,12 +29,13 @@ public class EncomendaService {
         this.entregadorMG = entregadorMG;
     }
 
-    public void send(Encomenda encomenda) {
+    public Message send(Encomenda encomenda) {
         ResponseEntity send = sendToState(encomenda);
         LOGGER.info("Dispatched: {}\n{}\n{}",
                 send.getBody(),
                 send.getStatusCodeValue(),
                 send.getHeaders().entrySet());
+        return new Message("Encomenda {0} sent to the Dispatcher Successfully".replace("{0}", "encomenda.getId()"));
     }
 
     private ResponseEntity sendToState(Encomenda encomenda) {

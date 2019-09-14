@@ -6,5 +6,5 @@
 FROM openjdk:12
 #COPY --from=builder /home/src/build/libs/*.jar /app.jar
 COPY ./build/libs/*.jar  /app.jar
-EXPOSE 8081
+EXPOSE 8082
 ENTRYPOINT ["java","-jar","/app.jar"]

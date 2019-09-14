@@ -1,16 +1,16 @@
-#apiVersion: v1
-#kind: Service
-#metadata:
-#  labels:
-#    app: transportadora-dispatcher
-#  name: transportadora-dispatcher-svc
-#  namespace: raptorslog
-#spec:
-#  type: ClusterIP
-#  ports:
-#    - name: app-port
-#      protocol: TCP
-#      port: 8080
-#      targetPort: 8080
-#  selector:
-#    app: transportadora-dispatcher
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: transportadora-dispatcher
+  name: transportadora-dispatcher-svc
+  namespace: raptorslog
+spec:
+  type: ClusterIP
+  ports:
+    - name: app-port
+      protocol: TCP
+      port: 8082
+      targetPort: 8082
+  selector:
+    app: transportadora-dispatcher

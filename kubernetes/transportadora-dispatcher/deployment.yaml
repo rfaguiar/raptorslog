@@ -30,7 +30,7 @@ spec:
           securityContext:
             privileged: false
           ports:
-            - containerPort: 8081
+            - containerPort: 8082
               name: app-port
               protocol: TCP
           env:
