@@ -26,7 +26,10 @@ gradleb-loja:
 gradleb-transportadora:
 	cd ./transportadora/ && ./gradlew clean build -Dorg.gradle.java.home=/usr/lib/jvm/java-12-openjdk-amd64/;
 
-gradleb-all: gradleb-loja gradleb-transportadora gradleb-entregador
+gradleb-transportadora-dispatcher:
+	cd ./transportadora-dispatcher/ && ./gradlew clean build -Dorg.gradle.java.home=/usr/lib/jvm/java-12-openjdk-amd64/;
+
+gradleb-all: gradleb-loja gradleb-entregador gradleb-transportadora gradleb-transportadora-dispatcher
 
 dockerb-rabbitmq:
 	docker build --force-rm -t rabbitmq:1.0.0 ./queue/;
@@ -40,7 +43,10 @@ dockerb-loja: gradleb-loja
 dockerb-transportadora: gradleb-transportadora
 	docker build --force-rm -t transportadora:1.0.0 ./transportadora/;
 
-dockerb-all: dockerb-rabbitmq gradleb-loja gradleb-transportadora gradleb-entregador
+dockerb-transportadora-dispatcher: gradleb-transportadora-dispatcher
+	docker build --force-rm -t transportadora:1.0.0 ./transportadora-dispatcher/;
+
+dockerb-all: dockerb-rabbitmq gradleb-loja gradleb-entregador gradleb-transportadora gradleb-transportadora-dispatcher
 
 compose-build: compose-down gradleb-all
 	docker-compose build;
@@ -65,6 +71,9 @@ health:
 	echo -e "\n"; \
 	echo -e "HealthCheck TRANSPORTADORA:\n"; \
 	curl -k http://localhost:8081/actuator/health; \
+	echo -e "\n"; \
+	echo -e "HealthCheck TRANSPORTADORA-DISPATCHER:\n"; \
+	curl -k http://localhost:8083/actuator/health; \
 	echo -e "\n"; \
 	echo -e "HealthCheck ENTREGADOR:\n"; \
 	curl -k http://localhost:8082/actuator/health; \
@@ -95,10 +104,20 @@ transportadorarun:
 	-e ENV_RABBITMQ_USER=guest \
 	-e ENV_RABBITMQ_PASS=guest \
 	-e ENV_QUEUE_NAME=raptorslog.queue \
+	--link rabbitmq:rabbitmq \
+	-p 8081:8080 transportadora:1.0.0;
+
+transportadora-dispatcherrun:
+	docker run -d --network minha-rede --name transportadora-dispatcher \
+	-e ENV_RABBITMQ_HOST=rabbitmq \
+	-e ENV_RABBITMQ_PORT=5672 \
+	-e ENV_RABBITMQ_USER=guest \
+	-e ENV_RABBITMQ_PASS=guest \
+	-e ENV_QUEUE_NAME=raptorslog.queue \
 	-e ENV_ENTREGADOR=http://entregador:8070 \
 	--link rabbitmq:rabbitmq \
 	--link entregador:entregador \
-	-p 8081:8080 transportadora:1.0.0;
+	-p 8083:8080 transportadora-dispatcher:1.0.0;
 
 entregadorrun:
 	docker run -d --network minha-rede --name entregador \
@@ -113,10 +132,13 @@ loja-delete:
 transportadora-delete:
 	docker container rm -f transportadora;
 
+transportadora-dispatcher-delete:
+	docker container rm -f transportadora-dispatcher;
+
 entregador-delete:
 	docker container rm -f entregador;
 
-dockerrmall: rabbitmq-delete loja-delete transportadora-delete entregador-delete
+dockerrmall: rabbitmq-delete loja-delete transportadora-delete transportadora-dispatcher-delete entregador-delete
 
 # export ISTIO_HOME=`pwd`/istio-1.2.5
 # export PATH=$ISTIO_HOME/bin:$PATH
@@ -145,7 +167,8 @@ k-dashboard:
 	minikube -p minikube dashboard;
 
 k-start:
-	minikube start;
+	minikube start; \
+	kubectl config set-context $(kubectl config current-context) --namespace=raptorslog;
 
 k-ip:
 	minikube -p minikube ip
@@ -198,23 +221,41 @@ k-deploy-transportadora: k-build-transportadora
 k-delete-transportadora:
 	kubectl delete -f kubernetes/transportadora/;
 
+k-build-transportadora-dispatcher: gradleb-transportadora-dispatcher
+	eval $$(minikube -p minikube docker-env) && docker build --force-rm -t transportadora-dispatcher:1.0.0 ./transportadora-dispatcher/;
+
+k-deploy-transportadora-dispatcher: k-build-transportadora-dispatcher
+	kubectl apply -f <(istioctl kube-inject -f kubernetes/transportadora-dispatcher/deployment.yaml)
+#	kubectl apply -f kubernetes/transportadora-dispatcher/service.yaml
+#	kubectl apply -f kubernetes/transportadora-dispatcher/gateway.yaml
+#	kubectl apply -f kubernetes/transportadora-dispatcher/ingress.yaml
+#	kubectl apply -f kubernetes/transportadora-dispatcher/;
+
+k-delete-transportadora-dispatcher:
+	kubectl delete -f kubernetes/transportadora-dispatcher/;
+
 k-build-loja: gradleb-loja
 	eval $$(minikube -p minikube docker-env) && docker build --force-rm -t loja:1.0.0 ./loja/;
 
 k-deploy-loja: k-build-loja
 	kubectl apply -f <(istioctl kube-inject -f kubernetes/loja/deployment.yaml)
-	kubectl apply -f kubernetes/loja/service.yaml
-	kubectl apply -f kubernetes/loja/gateway.yaml
-	kubectl apply -f kubernetes/loja/ingress.yaml
+	kubectl apply -f kubernetes/loja/service-lb.yaml
+#	kubectl apply -f kubernetes/loja/service.yaml
+#	kubectl apply -f kubernetes/loja/gateway.yaml
+#	kubectl apply -f kubernetes/loja/ingress.yaml
 #	kubectl apply -f kubernetes/loja/;
+
+k-expose-loja:
+	minikube service loja-svc --namespace=raptorslog;
 
 k-delete-loja:
 	kubectl delete -f kubernetes/loja/;
 
-k-deployall: k-deploy-queue k-deploy-entregador k-deploy-loja k-deploy-transportadora
+k-deployall: k-deploy-queue k-deploy-entregador k-deploy-loja k-deploy-transportadora k-deploy-transportadora-dispatcher
 
 k-test-raptorslog:
-	while true; do sleep 1; curl -X POST http://raptorslog.loja.local/v1/pedido; echo -e '\n';done
+	while true; do sleep 1; curl -X POST http://$$(minikube -p minikube ip):31930/v1/pedido; echo -e '\n';done
+#	while true; do sleep 1; curl -X POST http://raptorslog.loja.local/v1/pedido; echo -e '\n';done
 
 k-deleteall: k-delete-loja k-delete-transportadora k-delete-entregador k-delete-queue
 

@@ -2,35 +2,35 @@ apiVersion: extensions/v1beta1 # for versions before 1.9.0 use apps/v1beta2
 kind: Deployment
 metadata:
   labels:
-    app: transportadora
+    app: transportadora-dispatcher
     version: v1
-  name: transportadora
+  name: transportadora-dispatcher
   namespace: raptorslog
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: transportadora
+      app: transportadora-dispatcher
       version: v1
   strategy:
     type: Recreate
   template:
     metadata:
       labels:
-        app: transportadora
+        app: transportadora-dispatcher
         version: v1
         environment: dev
       annotations:
         sidecar.istio.io/inject: "true"
     spec:
       containers:
-        - image: transportadora:1.0.0
-          name: transportadora
+        - image: transportadora-dispatcher:1.0.0
+          name: transportadora-dispatcher
           imagePullPolicy: IfNotPresent
           securityContext:
             privileged: false
           ports:
-            - containerPort: 8080
+            - containerPort: 8081
               name: app-port
               protocol: TCP
           env:
@@ -48,6 +48,8 @@ spec:
               value: "raptorslog.exchange"
             - name: ENV_QUEUE_ROUTE_KEY
               value: "raptorslog.routingkey"
+            - name: ENV_ENTREGADOR
+              value: "http://entregador-svc:8070"
           readinessProbe:
             httpGet:
               path: /actuator/health

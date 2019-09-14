@@ -60,11 +60,37 @@ services:
       - ENV_RABBITMQ_USER=guest
       - ENV_RABBITMQ_PASS=guest
       - ENV_QUEUE_NAME=raptorslog.queue
-      - ENV_ENTREGADOR=http://entregador:8070
     ports:
       - 8081:8080
     image: transportadora:1.0.0
     container_name: transportadora
+    networks:
+      - desenv-network
+    links:
+      - "rabbitmq:rabbitmq"
+    depends_on:
+      - rabbitmq
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  transportadora-dispatcher:
+    build:
+      context: ./transportadora-dispatcher/
+      dockerfile: ./Dockerfile
+    environment:
+      - ENV_RABBITMQ_HOST=rabbitmq
+      - ENV_RABBITMQ_PORT=5672
+      - ENV_RABBITMQ_USER=guest
+      - ENV_RABBITMQ_PASS=guest
+      - ENV_QUEUE_NAME=raptorslog.queue
+      - ENV_ENTREGADOR=http://entregador:8070
+    ports:
+      - 8083:8081
+    image: transportadora-dispatcher:1.0.0
+    container_name: transportadora-dispatcher
     networks:
       - desenv-network
     links:
@@ -74,7 +100,7 @@ services:
       - rabbitmq
       - entregador
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      test: ["CMD", "curl", "-f", "http://localhost:8081/actuator/health"]
       interval: 5s
       timeout: 5s
       retries: 5
