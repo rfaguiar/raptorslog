@@ -35,7 +35,7 @@ public class EncomendaService {
                 send.getBody(),
                 send.getStatusCodeValue(),
                 send.getHeaders().entrySet());
-        return new Message("Encomenda {0} sent to the Dispatcher Successfully".replace("{0}", "encomenda.getId()"));
+        return new Message("Encomenda {0} sent to the Dispatcher Successfully".replace("{0}", encomenda.getId()));
     }
 
     private ResponseEntity sendToState(Encomenda encomenda) {
