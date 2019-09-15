@@ -2,30 +2,30 @@ apiVersion: extensions/v1beta1 # for versions before 1.9.0 use apps/v1beta2
 kind: Deployment
 metadata:
   labels:
-    app: transportadora
+    app: transportadora-receiver
     version: v1
-  name: transportadora
+  name: transportadora-receiver
   namespace: raptorslog
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: transportadora
+      app: transportadora-receiver
       version: v1
   strategy:
     type: Recreate
   template:
     metadata:
       labels:
-        app: transportadora
+        app: transportadora-receiver
         version: v1
         environment: dev
       annotations:
         sidecar.istio.io/inject: "true"
     spec:
       containers:
-        - image: transportadora:1.0.0
-          name: transportadora
+        - image: transportadora-receiver:1.0.0
+          name: transportadora-receiver
           imagePullPolicy: IfNotPresent
           securityContext:
             privileged: false

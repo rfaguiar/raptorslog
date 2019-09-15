@@ -1,7 +1,7 @@
 #apiVersion: networking.istio.io/v1alpha3
 #kind: Gateway
 #metadata:
-#  name: transportadora-gateway
+#  name: transportadora-receiver-gateway
 #  namespace: raptorslog
 #spec:
 #  selector:
@@ -17,18 +17,18 @@
 #apiVersion: networking.istio.io/v1alpha3
 #kind: VirtualService
 #metadata:
-#  name: transportadora-gateway
+#  name: transportadora-receiver-gateway
 #  namespace: raptorslog
 #spec:
 #  hosts:
 #    - "*"
 #  gateways:
-#    - transportadora-gateway
+#    - transportadora-receiver-gateway
 #  http:
 #    - match:
 #        - port: 8080
 #      route:
 #        - destination:
-#            host: transportadora-svc
+#            host: transportadora-receiver-svc
 #            port:
 #              number: 8080

@@ -31,7 +31,7 @@ out/
 ### VS Code ###
 .vscode/
 /.gradle/
-/transportadora/.gradle/
+/transportadora-receiver/.gradle/
 /transportadora-consumer/.gradle/
 /transportadora-dispatcher/.gradle/
 /loja/.gradle/

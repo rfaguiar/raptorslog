@@ -50,9 +50,9 @@ services:
       timeout: 5s
       retries: 5
 
-  transportadora:
+  transportadora-receiver:
     build:
-      context: ./transportadora/
+      context: ./transportadora-receiver/
       dockerfile: ./Dockerfile
     environment:
       - ENV_RABBITMQ_HOST=rabbitmq
@@ -62,8 +62,8 @@ services:
       - ENV_QUEUE_NAME=raptorslog.queue
     ports:
       - 8081:8080
-    image: transportadora:1.0.0
-    container_name: transportadora
+    image: transportadora-receiver:1.0.0
+    container_name: transportadora-receiver
     networks:
       - desenv-network
     links:

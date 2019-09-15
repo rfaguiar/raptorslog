@@ -35,7 +35,7 @@ spec:
               protocol: TCP
           env:
             - name: ENV_TRANSPORTADORA
-              value: "http://transportadora-svc:8080"
+              value: "http://transportadora-receiver-svc:8080"
           readinessProbe:
             httpGet:
               path: /actuator/health
