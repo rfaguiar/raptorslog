@@ -24,6 +24,8 @@ ext {
 }
 
 dependencies {
+	compile group: 'io.micrometer', name: 'micrometer-registry-prometheus'
+
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
 	implementation 'org.springframework.boot:spring-boot-starter-amqp'
 	implementation 'org.springframework.boot:spring-boot-starter-web'

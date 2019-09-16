@@ -12,5 +12,5 @@
 #        paths:
 #          - path: /
 #            backend:
-#              serviceName: entregador-am-svc
+#              serviceName: entregador-am
 #              servicePort: 8071

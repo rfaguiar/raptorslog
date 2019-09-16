@@ -21,6 +21,10 @@ spec:
         version: v1
         environment: dev
       annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/scheme: "http"
+        prometheus.io/path: "/api/metrics"
+        prometheus.io/port: "15672"
         sidecar.istio.io/inject: "true"
     spec:
       containers:
@@ -30,22 +34,18 @@ spec:
           securityContext:
             privileged: false
           ports:
-            - containerPort: 15672
-              name: app-port-15672
-              protocol: TCP
-            - containerPort: 5671
-              name: queue-port1
-              protocol: TCP
-            - containerPort: 5672
-              name: queue-port2
-              protocol: TCP
-            - containerPort: 4369 # don't touch this config
-              name: epmd # don't touch this config
-              protocol: TCP
+            - name: epmd # don't touch this config
+              containerPort: 4369 # don't touch this config
+            - name: http-app
+              containerPort: 15672
+            - name: tcp-queue1
+              containerPort: 5671
+            - name: tcp-queue2
+              containerPort: 5672
           readinessProbe:
             httpGet:
               path: /
-              port: app-port-15672
+              port: http-app
             initialDelaySeconds: 10
             periodSeconds: 10
             failureThreshold: 10

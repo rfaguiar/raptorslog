@@ -12,5 +12,5 @@ spec:
         paths:
           - path: /
             backend:
-              serviceName: loja-svc
+              serviceName: loja
               servicePort: 80

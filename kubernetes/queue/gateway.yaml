@@ -29,6 +29,6 @@
 #        - port: 15672
 #      route:
 #        - destination:
-#            host: rabbitmq-svc
+#            host: rabbitmq
 #            port:
 #              number: 15672

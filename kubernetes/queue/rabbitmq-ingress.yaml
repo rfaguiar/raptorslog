@@ -12,5 +12,5 @@ spec:
         paths:
           - path: /
             backend:
-              serviceName: rabbitmq-svc
+              serviceName: rabbitmq
               servicePort: 15672

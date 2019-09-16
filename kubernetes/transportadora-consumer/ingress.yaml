@@ -12,5 +12,5 @@
 #        paths:
 #          - path: /
 #            backend:
-#              serviceName: transportadora-consumer-svc
+#              serviceName: transportadora-consumer
 #              servicePort: 8081

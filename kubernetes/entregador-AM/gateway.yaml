@@ -29,6 +29,6 @@
 #        - port: 8071
 #      route:
 #        - destination:
-#            host: entregador-am-svc
+#            host: entregador-am
 #            port:
 #              number: 8071

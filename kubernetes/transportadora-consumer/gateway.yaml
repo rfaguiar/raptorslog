@@ -29,6 +29,6 @@
 #        - port: 8081
 #      route:
 #        - destination:
-#            host: transportadora-consumer-svc
+#            host: transportadora-consumer
 #            port:
 #              number: 8081

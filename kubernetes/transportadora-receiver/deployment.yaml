@@ -21,6 +21,10 @@ spec:
         version: v1
         environment: dev
       annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/scheme: "http"
+        prometheus.io/path: "/actuator/prometheus"
+        prometheus.io/port: "8080"
         sidecar.istio.io/inject: "true"
     spec:
       containers:
@@ -31,11 +35,10 @@ spec:
             privileged: false
           ports:
             - containerPort: 8080
-              name: app-port
-              protocol: TCP
+              name: http
           env:
             - name: ENV_RABBITMQ_HOST
-              value: "rabbitmq-svc"
+              value: "rabbitmq"
             - name: ENV_RABBITMQ_PORT
               value: "5672"
             - name: ENV_RABBITMQ_USER
@@ -51,7 +54,7 @@ spec:
           readinessProbe:
             httpGet:
               path: /actuator/health
-              port: app-port
+              port: http
             initialDelaySeconds: 10
             periodSeconds: 10
             failureThreshold: 10

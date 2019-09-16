@@ -197,7 +197,7 @@ k-setup:
 	kubectl config set-context $(kubectl config current-context) --namespace=raptorslog;
 
 k-istio-setup:
-	for i in istio-1.2.5/install/kubernetes/helm/istio-init/files/crd*yaml; do kubectl apply -f $i; done; \
+	for i in istio-1.2.5/install/kubernetes/helm/istio-init/files/crd*yaml; do kubectl apply -f $$i; done; \
 	kubectl apply -f istio-1.2.5/install/kubernetes/istio-demo.yaml;
 
 k-expose-telemetry:
@@ -220,7 +220,10 @@ k-ip:
 	minikube -p minikube ip
 
 k-stop:
-	minikube stop;
+	minikube -p minikube stop;
+
+k-delete:
+	minikube -p minikube delete;
 
 k-getall:
 	kubectl -n raptorslog get deploy,rc,rs,pod,svc,ing;
@@ -232,6 +235,7 @@ k-deploy-queue: k-build-queue
 	kubectl apply -f kubernetes/queue/policy-istio.yaml
 	kubectl apply -f <(istioctl kube-inject -f kubernetes/queue/rabbitmq-deployment.yaml)
 	kubectl apply -f kubernetes/queue/rabbitmq-service.yaml
+	kubectl apply -f kubernetes/queue/rabbitmq-ingress.yaml
 	sleep 20; \
 #	kubectl apply -f kubernetes/queue/;
 
@@ -331,7 +335,7 @@ k-deploy-loja: k-build-loja
 #	kubectl apply -f kubernetes/loja/;
 
 k-expose-loja:
-	minikube service loja-svc --namespace=raptorslog;
+	minikube service loja --namespace=raptorslog;
 
 k-delete-loja:
 	kubectl delete -f kubernetes/loja/;

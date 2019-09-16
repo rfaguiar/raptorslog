@@ -1,17 +1,15 @@
 apiVersion: v1
 kind: Service
 metadata:
+  name: entregador-am
   labels:
     app: entregador-am
-  name: entregador-am-svc
   namespace: raptorslog
 spec:
   type: ClusterIP
   ports:
-    - name: app-port
-      protocol: TCP
-      port: 8071
-      targetPort: 8071
+  - name: http
+    port: 8071
   selector:
     app: entregador-am
 

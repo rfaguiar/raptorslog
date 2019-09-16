@@ -1,4 +1,4 @@
-FROM rabbitmq:management-alpine
+FROM deadtrickster/rabbitmq_prometheus:3.7-alpine
 
 ADD rabbitmq.config /etc/rabbitmq/
 ADD definitions.json /etc/rabbitmq/

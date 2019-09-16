@@ -6,6 +6,7 @@ metadata:
     version: v1
   name: entregador-am
   namespace: raptorslog
+  annotations:
 spec:
   replicas: 1
   selector:
@@ -21,6 +22,10 @@ spec:
         version: v1
         environment: dev
       annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/scheme: "http"
+        prometheus.io/path: "/actuator/prometheus"
+        prometheus.io/port: "8071"
         sidecar.istio.io/inject: "true"
     spec:
       containers:
@@ -30,13 +35,12 @@ spec:
           securityContext:
             privileged: false
           ports:
-            - containerPort: 8071
-              name: app-port
-              protocol: TCP
+            - name: http
+              containerPort: 8071
           readinessProbe:
             httpGet:
               path: /actuator/health
-              port: app-port
+              port: http
             initialDelaySeconds: 10
             periodSeconds: 10
             failureThreshold: 10

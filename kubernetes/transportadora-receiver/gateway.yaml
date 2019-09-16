@@ -29,6 +29,6 @@
 #        - port: 8080
 #      route:
 #        - destination:
-#            host: transportadora-receiver-svc
+#            host: transportadora-receiver
 #            port:
 #              number: 8080

@@ -1,16 +1,15 @@
 apiVersion: v1
 kind: Service
 metadata:
+  name: loja
+  namespace: raptorslog
   labels:
     app: loja
-  name: loja-svc
-  namespace: raptorslog
 spec:
   type: LoadBalancer
   ports:
-    - name: app-port
+    - name: http
       nodePort: 31930
-      protocol: TCP
       port: 80
       targetPort: 8090
   selector:

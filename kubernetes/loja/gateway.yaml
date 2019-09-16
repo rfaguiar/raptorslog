@@ -29,6 +29,6 @@ spec:
         - port: 80
       route:
         - destination:
-            host: loja-svc
+            host: loja
             port:
               number: 80

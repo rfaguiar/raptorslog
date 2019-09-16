@@ -1,17 +1,15 @@
 apiVersion: v1
 kind: Service
 metadata:
+  name: entregador-rs
+  namespace: raptorslog
   labels:
     app: entregador-rs
-  name: entregador-rs-svc
-  namespace: raptorslog
 spec:
   type: ClusterIP
   ports:
-    - name: app-port
-      protocol: TCP
+    - name: http
       port: 8070
-      targetPort: 8070
   selector:
     app: entregador-rs
 

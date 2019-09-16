@@ -21,6 +21,10 @@ spec:
         version: v1
         environment: dev
       annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/scheme: "http"
+        prometheus.io/path: "/actuator/prometheus"
+        prometheus.io/port: "8082"
         sidecar.istio.io/inject: "true"
     spec:
       containers:
@@ -31,19 +35,18 @@ spec:
             privileged: false
           ports:
             - containerPort: 8082
-              name: app-port
-              protocol: TCP
+              name: http
           env:
             - name: ENV_ENTREGADOR_RS
-              value: "http://entregador-rs-svc:8070"
+              value: "http://entregador-rs:8070"
             - name: ENV_ENTREGADOR_AM
-              value: "http://entregador-am-svc:8071"
+              value: "http://entregador-am:8071"
             - name: ENV_ENTREGADOR_MG
-              value: "http://entregador-mg-svc:8072"
+              value: "http://entregador-mg:8072"
           readinessProbe:
             httpGet:
               path: /actuator/health
-              port: app-port
+              port: http
             initialDelaySeconds: 10
             periodSeconds: 10
             failureThreshold: 10

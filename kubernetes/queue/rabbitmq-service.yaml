@@ -1,28 +1,20 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: rabbitmq-svc
+  name: rabbitmq
   namespace: raptorslog
   labels:
     app: rabbitmq
 spec:
   type: ClusterIP
   ports:
-    - name: app-port-15672
-      protocol: TCP
-      port: 15672
-      targetPort: 15672
-    - name: queue-port1
-      protocol: TCP
-      port: 5671
-      targetPort: 5671
-    - name: queue-port2
-      protocol: TCP
-      port: 5672
-      targetPort: 5672
     - name: epmd  # don't touch this config
-      protocol: TCP
       port: 4369  # don't touch this config
-      targetPort: 4369
+    - name: http-app
+      port: 15672
+    - name: tcp-queue1
+      port: 5671
+    - name: tcp-queue2
+      port: 5672
   selector:
     app: rabbitmq

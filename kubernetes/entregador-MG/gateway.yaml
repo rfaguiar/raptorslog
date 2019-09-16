@@ -29,6 +29,6 @@
 #        - port: 8072
 #      route:
 #        - destination:
-#            host: entregador-mg-svc
+#            host: entregador-mg
 #            port:
 #              number: 8072

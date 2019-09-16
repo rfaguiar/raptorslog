@@ -20,6 +20,8 @@ repositories {
 }
 
 dependencies {
+	compile group: 'io.micrometer', name: 'micrometer-registry-prometheus'
+
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-data-rest'
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
