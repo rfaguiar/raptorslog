@@ -3,14 +3,12 @@ kind: Service
 metadata:
   labels:
     app: loja
-  name: loja-svc
+  name: loja
   namespace: raptorslog
 spec:
   type: ClusterIP
   ports:
-    - name: app-port
-      protocol: TCP
-      port: 80
-      targetPort: 8090
+    - name: http
+      port: 8090
   selector:
     app: loja

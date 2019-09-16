@@ -3,14 +3,12 @@ kind: Service
 metadata:
   labels:
     app: transportadora
-  name: transportadora-svc
+  name: transportadora
   namespace: raptorslog
 spec:
   type: ClusterIP
   ports:
-    - name: app-port
-      protocol: TCP
+    - name: http
       port: 8080
-      targetPort: 8080
   selector:
     app: transportadora

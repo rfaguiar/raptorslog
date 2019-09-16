@@ -29,6 +29,6 @@
 #        - port: 8070
 #      route:
 #        - destination:
-#            host: entregador-svc
+#            host: entregador
 #            port:
 #              number: 8070

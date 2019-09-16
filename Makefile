@@ -163,6 +163,7 @@ k-deploy-queue: k-build-queue
 	kubectl apply -f kubernetes/queue/policy-istio.yaml
 	kubectl apply -f <(istioctl kube-inject -f kubernetes/queue/rabbitmq-deployment.yaml)
 	kubectl apply -f kubernetes/queue/rabbitmq-service.yaml
+	kubectl apply -f kubernetes/queue/rabbitmq-ingress.yaml
 	sleep 30; \
 #	kubectl apply -f kubernetes/queue/;
 

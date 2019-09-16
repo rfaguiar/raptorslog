@@ -1,7 +1,7 @@
 #apiVersion: extensions/v1beta1
 #kind: Ingress
 #metadata:
-#  name: entregador-ing
+#  name: entregador
 #  namespace: raptorslog
 #  labels:
 #    app: entregador
@@ -12,5 +12,5 @@
 #        paths:
 #          - path: /
 #            backend:
-#              serviceName: entregador-svc
+#              serviceName: entregador
 #              servicePort: 8070

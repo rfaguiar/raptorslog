@@ -4,7 +4,7 @@ metadata:
   labels:
     app: entregador
     version: v1
-  name: entregador
+  name: entregador-v1
   namespace: raptorslog
 spec:
   replicas: 1
@@ -31,12 +31,11 @@ spec:
             privileged: false
           ports:
             - containerPort: 8070
-              name: app-port
-              protocol: TCP
+              name: http
           readinessProbe:
             httpGet:
               path: /actuator/health
-              port: app-port
+              port: http
             initialDelaySeconds: 10
             periodSeconds: 10
             failureThreshold: 10

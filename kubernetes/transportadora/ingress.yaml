@@ -12,5 +12,5 @@
 #        paths:
 #          - path: /
 #            backend:
-#              serviceName: transportadora-svc
+#              serviceName: transportadora
 #              servicePort: 8080

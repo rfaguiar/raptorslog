@@ -3,7 +3,7 @@ kind: Ingress
 metadata:
   labels:
     app: loja
-  name: loja-ing
+  name: loja
   namespace: raptorslog
 spec:
   rules:
@@ -12,5 +12,5 @@ spec:
         paths:
           - path: /
             backend:
-              serviceName: loja-svc
-              servicePort: 80
+              serviceName: loja
+              servicePort: 8090

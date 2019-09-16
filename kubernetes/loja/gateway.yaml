@@ -1,7 +1,7 @@
 apiVersion: networking.istio.io/v1alpha3
 kind: Gateway
 metadata:
-  name: loja-gateway
+  name: loja
   namespace: raptorslog
 spec:
   selector:
@@ -17,18 +17,18 @@ spec:
 apiVersion: networking.istio.io/v1alpha3
 kind: VirtualService
 metadata:
-  name: loja-gateway
+  name: loja
   namespace: raptorslog
 spec:
   hosts:
     - "*"
   gateways:
-    - loja-gateway
+    - loja
   http:
     - match:
         - port: 80
       route:
         - destination:
-            host: loja-svc
+            host: loja
             port:
               number: 80

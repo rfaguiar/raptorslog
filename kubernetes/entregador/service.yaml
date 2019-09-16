@@ -3,15 +3,13 @@ kind: Service
 metadata:
   labels:
     app: entregador
-  name: entregador-svc
+  name: entregador
   namespace: raptorslog
 spec:
   type: ClusterIP
   ports:
-    - name: app-port
-      protocol: TCP
+    - name: http
       port: 8070
-      targetPort: 8070
   selector:
     app: entregador
 
