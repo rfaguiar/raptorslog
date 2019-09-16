@@ -4,9 +4,8 @@ metadata:
   labels:
     app: entregador-am
     version: v1
-  name: entregador-am
+  name: entregador-am-v1
   namespace: raptorslog
-  annotations:
 spec:
   replicas: 1
   selector:

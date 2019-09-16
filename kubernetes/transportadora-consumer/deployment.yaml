@@ -4,7 +4,7 @@ metadata:
   labels:
     app: transportadora-consumer
     version: v1
-  name: transportadora-consumer
+  name: transportadora-consumer-v1
   namespace: raptorslog
 spec:
   replicas: 1

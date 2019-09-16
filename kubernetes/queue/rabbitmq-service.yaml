@@ -18,3 +18,11 @@ spec:
       port: 5672
   selector:
     app: rabbitmq
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: rabbitmq
+  namespace: raptorslog
+spec:
+  host: rabbitmq

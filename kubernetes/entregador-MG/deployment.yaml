@@ -4,7 +4,7 @@ metadata:
   labels:
     app: entregador-mg
     version: v1
-  name: entregador-mg
+  name: entregador-mg-v1
   namespace: raptorslog
 spec:
   replicas: 1
