@@ -276,12 +276,12 @@ k-deploy-loja: k-build-loja
 k-delete-loja:
 	kubectl delete -f kubernetes/loja/;
 
-k-deployall: k-deploy-queue k-deploy-entregador-RS k-deploy-entregador-AM k-deploy-entregador-MG k-deploy-loja k-deploy-transportadora
+k-deployall: k-deploy-entregador-RS k-deploy-entregador-AM k-deploy-entregador-MG k-deploy-loja k-deploy-transportadora
 
 k-test-raptorslog:
 	while true; do sleep 1; curl -X POST http://raptorslog.loja.local/v1/pedido; echo -e '\n';done
 
-k-deleteall: k-delete-loja k-delete-transportadora k-delete-entregador-RS k-delete-entregador-AM k-delete-entregador-MG k-delete-queue
+k-deleteall: k-delete-loja k-delete-transportadora k-delete-entregador-RS k-delete-entregador-AM k-delete-entregador-MG
 
 k-show-istio:
 	kubectl get deploy,svc,pod -n istio-system; \

@@ -8,15 +8,15 @@ import org.springframework.stereotype.Service;
 @Service
 public class PedidoService {
 
-    private QueueSender queueSender;
+    private EncomendaService encomendaService;
 
     @Autowired
-    public PedidoService(QueueSender queueSender) {
-        this.queueSender = queueSender;
+    public PedidoService(EncomendaService encomendaService) {
+        this.encomendaService = encomendaService;
     }
 
     public Message create(Encomenda encomenda) {
-        queueSender.send(encomenda);
+        encomendaService.send(encomenda);
         return new Message("Message {0} sent to the Queue Successfully".replace("{0}", "encomenda.getId()"));
     }
 }
