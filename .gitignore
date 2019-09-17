@@ -32,4 +32,7 @@ out/
 .vscode/
 /.gradle/
 /transportadora/.gradle/
+/entregador-AM/.gradle/
+/entregador-MG/.gradle/
+/entregador-RS/.gradle/
 /loja/.gradle/

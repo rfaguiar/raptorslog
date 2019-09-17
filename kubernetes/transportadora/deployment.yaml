@@ -43,8 +43,12 @@ spec:
               value: "guest"
             - name: ENV_QUEUE_NAME
               value: "raptorslog.queue"
-            - name: ENV_ENTREGADOR
-              value: "http://entregador:8070"
+            - name: ENV_ENTREGADOR_RS
+              value: "http://entregador-rs:8070"
+            - name: ENV_ENTREGADOR_AM
+              value: "http://entregador-am:8071"
+            - name: ENV_ENTREGADOR_MG
+              value: "http://entregador-mg:8072"
           readinessProbe:
             httpGet:
               path: /actuator/health
