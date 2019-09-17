@@ -23,7 +23,7 @@ public class QueueSender {
     private String routingkey;
 
     public void send(Encomenda encomenda) {
-        amqpTemplate.convertAndSend(exchange, routingkey, encomenda);
         LOGGER.info("Send: {}", encomenda);
+        amqpTemplate.convertAndSend(exchange, routingkey, encomenda);
     }
 }

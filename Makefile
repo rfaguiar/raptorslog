@@ -255,7 +255,7 @@ k-build-transportadora: gradleb-transportadora
 
 k-deploy-transportadora: k-build-transportadora
 	kubectl apply -f <(istioctl kube-inject -f kubernetes/transportadora/deployment.yaml)
-#	kubectl apply -f kubernetes/transportadora/service.yaml
+	kubectl apply -f kubernetes/transportadora/service.yaml
 #	kubectl apply -f kubernetes/transportadora/gateway.yaml
 #	kubectl apply -f kubernetes/transportadora/ingress.yaml
 #	kubectl apply -f kubernetes/transportadora/;
