@@ -16,7 +16,7 @@ public class Entrega {
     @Id
     private String id;
     private String name;
-    private long delay=2;
+    private long delay=0;
 
     @PrePersist
     public void delayInsert() {

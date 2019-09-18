@@ -166,7 +166,7 @@ k-delete-namespace:
 	kubectl delete namespace raptorslog;
 
 k-istio-setup:
-	for i in istio-1.2.5/install/kubernetes/helm/istio-init/files/crd*yaml; do kubectl apply -f $i; done; \
+	for i in istio-1.2.5/install/kubernetes/helm/istio-init/files/crd*yaml; do kubectl apply -f $$i; done; \
 	kubectl apply -f istio-1.2.5/install/kubernetes/istio-demo.yaml;
 
 k-expose-telemetry:
@@ -182,7 +182,7 @@ k-dashboard:
 	minikube -p minikube dashboard;
 
 k-start:
-	minikube -p minikube; \
+	minikube -p minikube start; \
 	kubectl config set-context $$(kubectl config current-context) --namespace=raptorslog;
 
 k-ip:
@@ -276,12 +276,12 @@ k-deploy-loja: k-build-loja
 k-delete-loja:
 	kubectl delete -f kubernetes/loja/;
 
-k-deployall: k-deploy-entregador-RS k-deploy-entregador-AM k-deploy-entregador-MG k-deploy-loja k-deploy-transportadora
+k-deployall: k-deploy-loja k-deploy-transportadora k-deploy-entregador-RS k-deploy-entregador-AM k-deploy-entregador-MG
 
 k-test-raptorslog:
 	while true; do sleep 1; curl -X POST http://raptorslog.loja.local/v1/pedido; echo -e '\n';done
 
-k-deleteall: k-delete-loja k-delete-transportadora k-delete-entregador-RS k-delete-entregador-AM k-delete-entregador-MG
+k-deleteall: k-delete-entregador-RS k-delete-entregador-AM k-delete-entregador-MG k-delete-transportadora k-delete-loja
 
 k-show-istio:
 	kubectl get deploy,svc,pod -n istio-system; \
