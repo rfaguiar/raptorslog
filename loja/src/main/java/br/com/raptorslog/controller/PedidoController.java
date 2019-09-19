@@ -30,11 +30,7 @@ public class PedidoController {
 
     @PostMapping
     public ResponseEntity producer(@RequestHeader("User-Agent") String userAgent, @RequestBody(required = false) Optional<Encomenda> encomenda) {
-
-        tracer.activeSpan().setBaggageItem("User-Agent", userAgent);
-        if (encomenda.isPresent()) {
-            tracer.activeSpan().setBaggageItem("encomenda", encomenda.get().getId());
-        }
+        tracer.activeSpan().setBaggageItem("user-agent", userAgent);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(pedidoService.create(encomenda));

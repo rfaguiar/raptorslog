@@ -1,5 +1,6 @@
 package br.com.raptorslog;
 
+import io.jaegertracing.Configuration;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -18,8 +19,8 @@ public class TransportadoraApplication {
 		return restTemplateBuilder.build();
 	}
 
-//	@Bean
-//	public io.opentracing.Tracer tracer() {
-//		return Configuration.fromEnv().getTracer();
-//	}
+	@Bean
+	public io.opentracing.Tracer tracer() {
+		return Configuration.fromEnv().getTracer();
+	}
 }
