@@ -182,7 +182,7 @@ k-dashboard:
 	minikube -p minikube dashboard;
 
 k-start:
-	minikube -p minikube; \
+	minikube -p minikube start; \
 	kubectl config set-context $$(kubectl config current-context) --namespace=raptorslog;
 
 k-ip:
