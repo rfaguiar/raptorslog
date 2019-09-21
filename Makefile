@@ -279,7 +279,7 @@ k-delete-loja:
 k-deployall: k-deploy-loja k-deploy-transportadora k-deploy-entregador-RS k-deploy-entregador-AM k-deploy-entregador-MG
 
 k-test-raptorslog:
-	while true; do sleep 1; curl -X POST http://raptorslog.loja.local/v1/pedido; echo -e '\n';done
+	while true; do sleep 0.3; curl -X POST http://raptorslog.loja.local/v1/pedido; echo -e '';done
 
 k-deleteall: k-delete-entregador-RS k-delete-entregador-AM k-delete-entregador-MG k-delete-transportadora k-delete-loja
 
