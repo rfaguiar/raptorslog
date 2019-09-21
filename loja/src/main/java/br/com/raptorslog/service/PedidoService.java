@@ -2,17 +2,16 @@ package br.com.raptorslog.service;
 
 import br.com.raptorslog.model.Encomenda;
 import br.com.raptorslog.model.Estado;
-import br.com.raptorslog.model.Message;
 import br.com.raptorslog.repository.Transportadora;
 import io.opentracing.Tracer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 import java.util.Random;
-import java.util.UUID;
 
 @Service
 public class PedidoService {
@@ -28,16 +27,15 @@ public class PedidoService {
         this.tracer = tracer;
     }
 
-    public Message create(Optional<Encomenda> encomenda) {
-        long value = new Random().nextLong();;
+    public ResponseEntity<String> create(Optional<Encomenda> encomenda) {
+        long value = new Random().nextLong();
         String uuid = String.format("%016x", value);
 
         tracer.activeSpan().setBaggageItem("user-preference", uuid);
         Encomenda valid = encomenda.or(() -> createFake(uuid)).get();
         valid.setId(uuid);
         LOGGER.info("Sended: {}", valid);
-        transportadora.send(valid);
-        return new Message("Encomenda {0} sent to transportadora".replace("{0}", uuid));
+        return transportadora.send(valid);
     }
 
     private Optional<Encomenda> createFake(String uuid) {

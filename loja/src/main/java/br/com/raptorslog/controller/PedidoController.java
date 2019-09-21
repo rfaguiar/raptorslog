@@ -1,10 +1,10 @@
 package br.com.raptorslog.controller;
 
-import io.opentracing.Tracer;
 import br.com.raptorslog.model.Encomenda;
 import br.com.raptorslog.service.PedidoService;
+import io.opentracing.Tracer;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -21,18 +21,22 @@ public class PedidoController {
     private PedidoService pedidoService;
 
     private Tracer tracer;
+    private String applicationName;
 
     @Autowired
-    public PedidoController(PedidoService pedidoService, Tracer tracer) {
+    public PedidoController(PedidoService pedidoService, Tracer tracer,
+                            @Value("${spring.application.name}") String applicationName) {
         this.pedidoService = pedidoService;
         this.tracer = tracer;
+        this.applicationName = applicationName;
     }
 
     @PostMapping
-    public ResponseEntity producer(@RequestHeader("User-Agent") String userAgent, @RequestBody(required = false) Optional<Encomenda> encomenda) {
+    public ResponseEntity<String> producer(@RequestHeader("User-Agent") String userAgent, @RequestBody(required = false) Optional<Encomenda> encomenda) {
         tracer.activeSpan().setBaggageItem("user-agent", userAgent);
+        ResponseEntity resp = pedidoService.create(encomenda);
         return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(pedidoService.create(encomenda));
+                .status(resp.getStatusCode())
+                .body(String.format("%s v1 => %s", applicationName, resp.getBody()));
     }
 }

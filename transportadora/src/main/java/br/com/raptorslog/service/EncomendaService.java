@@ -28,12 +28,13 @@ public class EncomendaService {
         this.entregadorMG = entregadorMG;
     }
 
-    public void send(Encomenda encomenda) {
+    public ResponseEntity send(Encomenda encomenda) {
         ResponseEntity send = sendToState(encomenda);
         LOGGER.info("Dispatched: {}\n{}\n{}",
                 send.getBody(),
                 send.getStatusCodeValue(),
                 send.getHeaders().entrySet());
+        return send;
     }
 
     private ResponseEntity sendToState(Encomenda encomenda) {
