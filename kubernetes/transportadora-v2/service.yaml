@@ -1,0 +1,14 @@
+#apiVersion: v1
+#kind: Service
+#metadata:
+#  labels:
+#    app: transportadora
+#  name: transportadora
+#  namespace: raptorslog
+#spec:
+#  type: ClusterIP
+#  ports:
+#    - name: http
+#      port: 8080
+#  selector:
+#    app: transportadora

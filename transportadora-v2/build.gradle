@@ -1,0 +1,40 @@
+plugins {
+	id 'org.springframework.boot' version '2.1.7.RELEASE'
+	id 'io.spring.dependency-management' version '1.0.8.RELEASE'
+	id 'java'
+}
+
+group = 'br.com.raptorslog'
+version = '1.0.0-SNAPSHOT'
+sourceCompatibility = '12'
+
+configurations {
+	developmentOnly
+	runtimeClasspath {
+		extendsFrom developmentOnly
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+ext {
+	set('springCloudVersion', "Greenwich.SR2")
+}
+
+dependencies {
+	compile 'io.micrometer:micrometer-registry-prometheus:latest.release'
+	compile group: 'io.opentracing.contrib', name: 'opentracing-spring-jaeger-web-starter', version: '2.0.3'
+	compile group: 'io.jaegertracing', name: 'jaeger-core', version: '1.0.0'
+
+	implementation 'org.springframework.boot:spring-boot-starter-actuator'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	developmentOnly 'org.springframework.boot:spring-boot-devtools'
+}
+
+dependencyManagement {
+	imports {
+		mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+	}
+}

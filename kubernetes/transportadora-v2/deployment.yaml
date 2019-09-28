@@ -1,0 +1,52 @@
+apiVersion: extensions/v1beta1 # for versions before 1.9.0 use apps/v2beta2
+kind: Deployment
+metadata:
+  labels:
+    app: transportadora
+    version: v2
+  name: transportadora-v2
+  namespace: raptorslog
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: transportadora
+      version: v2
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: transportadora
+        version: v2
+        environment: dev
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/scheme: "http"
+        prometheus.io/path: "/actuator/prometheus"
+        prometheus.io/port: "8080"
+        sidecar.istio.io/inject: "true"
+    spec:
+      containers:
+        - image: transportadora-v2:1.0.0
+          name: transportadora
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            privileged: false
+          ports:
+            - containerPort: 8080
+              name: http
+          env:
+            - name: ENV_ENTREGADOR_RS
+              value: "http://entregador-rs:8070"
+            - name: ENV_ENTREGADOR_AM
+              value: "http://entregador-am:8071"
+            - name: ENV_ENTREGADOR_MG
+              value: "http://entregador-mg:8072"
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            failureThreshold: 10

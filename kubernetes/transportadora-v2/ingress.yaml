@@ -1,0 +1,16 @@
+#apiVersion: extensions/v1beta1
+#kind: Ingress
+#metadata:
+#  name: transportadora-ing
+#  namespace: raptorslog
+#  labels:
+#    app: loja
+#spec:
+#  rules:
+#    - host: raptorslog.transportadora.local
+#      http:
+#        paths:
+#          - path: /
+#            backend:
+#              serviceName: transportadora
+#              servicePort: 8080
