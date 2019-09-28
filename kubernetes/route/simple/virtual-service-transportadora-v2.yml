@@ -1,0 +1,13 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: transportadora
+spec:
+  hosts:
+    - transportadora
+  http:
+    - route:
+        - destination:
+            host: transportadora
+            subset: version-v2
+          weight: 100

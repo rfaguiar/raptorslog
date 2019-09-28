@@ -1,0 +1,14 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: transportadora
+  namespace: raptorslog
+spec:
+  hosts:
+  - transportadora
+  http:
+  - route:
+    - destination:
+        host: transportadora
+        subset: version-v1
+      weight: 100

@@ -323,3 +323,32 @@ k-deleteall: k-delete-entregador-RS k-delete-entregador-AM k-delete-entregador-M
 
 k-show-istio:
 	kubectl get deploy,svc,pod -n istio-system; \
+
+k-routing-transportadora:
+	kubectl apply -f kubernetes/route/simple/destination-rule-transportadora-v1-v2.yml;
+
+k-routing-transportadora-v1: k-routing-transportadora
+	kubectl apply -f kubernetes/route/simple/virtual-service-transportadora-v1.yml;
+
+k-routing-transportadora-v1-v2-90-10: k-routing-transportadora
+	kubectl apply -f kubernetes/route/simple/virtual-service-transportadora-v1-v2-90-10.yml;
+
+k-routing-transportadora-v1-v2-75-25: k-routing-transportadora
+	kubectl apply -f kubernetes/route/simple/virtual-service-transportadora-v1-v2-75-25.yml;
+
+k-routing-transportadora-v1-v2-25-75: k-routing-transportadora
+	kubectl apply -f kubernetes/route/simple/virtual-service-transportadora-v1-v2-25-75.yml;
+
+k-routing-transportadora-v2:
+	kubectl apply -f kubernetes/route/simple/virtual-service-transportadora-v2.yml;
+	kubectl apply -f kubernetes/route/simple/destination-rule-transportadora-v2.yml;
+
+k-delete-transportadora-deploy:
+	kubectl delete -f <(istioctl kube-inject -f kubernetes/transportadora/deployment.yaml);
+
+k-delete-transportadora-v2-deploy:
+	kubectl delete -f <(istioctl kube-inject -f kubernetes/transportadora-v2/deployment.yaml);
+
+k-clean-routing:
+	kubectl delete -f kubernetes/route/simple/virtual-service-transportadora-v2.yml; \
+	kubectl delete -f kubernetes/route/simple/destination-rule-transportadora-v1-v2.yml;

@@ -1,0 +1,11 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: transportadora
+  namespace: raptorslog
+spec:
+  host: transportadora
+  subsets:
+    - labels:
+        version: v2
+      name: version-v2

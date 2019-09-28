@@ -31,6 +31,6 @@ public class PedidoController {
         ResponseEntity resp = pedidoService.create(encomenda);
         return ResponseEntity
                 .status(resp.getStatusCode())
-                .body(String.format("%s v1 => %s", applicationName, resp.getBody()));
+                .body(String.format("%s v2 => %s", applicationName, resp.getBody()));
     }
 }
