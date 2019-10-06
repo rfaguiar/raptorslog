@@ -27,7 +27,7 @@ public class PedidoService {
         this.tracer = tracer;
     }
 
-    public ResponseEntity<String> create(Optional<Encomenda> encomenda) {
+    public ResponseEntity<String> create(Optional<Encomenda> encomenda, String userAgent) {
         long value = new Random().nextLong();
         String uuid = String.format("%016x", value);
 
@@ -35,7 +35,7 @@ public class PedidoService {
         Encomenda valid = encomenda.or(() -> createFake(uuid)).get();
         valid.setId(uuid);
         LOGGER.info("Sended: {}", valid);
-        return transportadora.send(valid);
+        return transportadora.send(valid, userAgent);
     }
 
     private Optional<Encomenda> createFake(String uuid) {

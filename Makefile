@@ -311,6 +311,11 @@ k-deploy-loja: k-build-loja
 	kubectl apply -f kubernetes/loja/ingress.yaml
 #	kubectl apply -f kubernetes/loja/;
 
+k-update-loja: k-build-loja
+	kubectl delete -f kubernetes/loja/deployment.yaml; \
+	sleep 1; \
+	kubectl apply -f <(istioctl kube-inject -f kubernetes/loja/deployment.yaml)
+
 k-delete-loja:
 	kubectl delete -f kubernetes/loja/;
 
@@ -352,3 +357,12 @@ k-delete-transportadora-v2-deploy:
 k-clean-routing:
 	kubectl delete -f kubernetes/route/simple/virtual-service-transportadora-v2.yml; \
 	kubectl delete -f kubernetes/route/simple/destination-rule-transportadora-v1-v2.yml;
+
+k-routing-transportadora-v2-safari: k-routing-transportadora
+	kubectl replace -f kubernetes/route/advanced/virtual-service-safari-transportadora-v2.yml;
+
+k-delete-routing-safari:
+	kubectl delete -f kubernetes/route/advanced/virtual-service-safari-transportadora-v2.yml;
+
+k-test-raptorslog-safari:
+	while true; do sleep 0.8; curl -X POST -A Safari http://raptorslog.loja.local/v1/pedido; echo -e '';done

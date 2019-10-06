@@ -4,7 +4,7 @@
 #RUN gradle build
 
 FROM openjdk:12
-ENV JAEGER_SERVICE_NAME=transportadora-v2 \
+ENV JAEGER_SERVICE_NAME=transportadora \
   JAEGER_ENDPOINT=http://jaeger-collector.istio-system.svc:14268/api/traces \
   JAEGER_PROPAGATION=b3 \
   JAEGER_SAMPLER_TYPE=const \

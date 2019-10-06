@@ -34,6 +34,12 @@ spec:
             - containerPort: 8090
               name: http
               protocol: TCP
+            - name: jolokia
+              containerPort: 8778
+              protocol: TCP
+            - name: prometheus
+              containerPort: 9779
+              protocol: TCP
           env:
             - name: ENV_TRANSPORTADORA
               value: "http://transportadora:8080"

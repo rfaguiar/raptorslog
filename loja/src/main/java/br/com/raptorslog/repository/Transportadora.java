@@ -5,5 +5,5 @@ import org.springframework.http.ResponseEntity;
 
 public interface Transportadora {
 
-    ResponseEntity send(Encomenda encomenda);
+    ResponseEntity send(Encomenda encomenda, String userAgent);
 }

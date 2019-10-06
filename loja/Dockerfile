@@ -4,12 +4,14 @@
 #RUN gradle build
 
 FROM openjdk:12
+
 ENV JAEGER_SERVICE_NAME=loja \
   JAEGER_ENDPOINT=http://jaeger-collector.istio-system.svc:14268/api/traces \
   JAEGER_PROPAGATION=b3 \
   JAEGER_SAMPLER_TYPE=const \
   JAEGER_SAMPLER_PARAM=1 \
   JAEGER_REPORTER_LOG_SPANS=true
+
 #COPY --from=builder /home/src/build/libs/*.jar /app.jar
 COPY ./build/libs/*.jar  /app.jar
 EXPOSE 8090

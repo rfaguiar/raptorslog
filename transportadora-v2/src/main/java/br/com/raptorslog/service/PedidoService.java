@@ -16,7 +16,7 @@ public class PedidoService {
         this.encomendaService = encomendaService;
     }
 
-    public ResponseEntity create(Encomenda encomenda) {
-        return encomendaService.send(encomenda);
+    public ResponseEntity create(Encomenda encomenda, String userAgent) {
+        return encomendaService.send(encomenda, userAgent);
     }
 }

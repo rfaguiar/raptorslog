@@ -28,8 +28,8 @@ public class EncomendaService {
         this.entregadorMG = entregadorMG;
     }
 
-    public ResponseEntity send(Encomenda encomenda) {
-        ResponseEntity send = sendToState(encomenda);
+    public ResponseEntity send(Encomenda encomenda, String userAgent) {
+        ResponseEntity send = sendToState(encomenda, userAgent);
         LOGGER.info("Dispatched: {}\n{}\n{}",
                 send.getBody(),
                 send.getStatusCodeValue(),
@@ -37,12 +37,12 @@ public class EncomendaService {
         return send;
     }
 
-    private ResponseEntity sendToState(Encomenda encomenda) {
+    private ResponseEntity sendToState(Encomenda encomenda, String userAgent) {
         Entrega entrega = new Entrega(encomenda);
         switch (encomenda.getEstado()) {
-            case MG: return entregadorMG.send(entrega);
-            case AM: return entregadorAM.send(entrega);
-            default: return entregadorRS.send(entrega);
+            case MG: return entregadorMG.send(entrega, userAgent);
+            case AM: return entregadorAM.send(entrega, userAgent);
+            default: return entregadorRS.send(entrega, userAgent);
         }
     }
 }
