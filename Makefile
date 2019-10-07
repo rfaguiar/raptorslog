@@ -382,3 +382,15 @@ k-delete-routing-mirror:
 
 k-test-raptorslog-safari:
 	while true; do sleep 0.8; curl -X POST -A Safari http://raptorslog.loja.local/v1/pedido; echo -e '';done
+
+k-transportador-v2-scale-to-3:
+	kubectl scale deployment transportadora-v2 --replicas=3;
+
+k-transportador-v2-scale-to-1:
+	kubectl scale deployment transportadora-v2 --replicas=1;
+
+k-routing-transportadora-random:
+	kubectl apply -f kubernetes/route/advanced/destination-rule-transportadora_lb_policy_app.yml;
+
+k-delete-routing-random:
+	kubectl delete -f kubernetes/route/advanced/destination-rule-transportadora_lb_policy_app.yml;
