@@ -190,9 +190,13 @@ k-create-namespace:
 k-delete-namespace:
 	kubectl delete namespace raptorslog;
 
-k-istio-setup:
+k-istio-1.2.5-setup:
 	for i in istio-1.2.5/install/kubernetes/helm/istio-init/files/crd*yaml; do kubectl apply -f $$i; done; \
 	kubectl apply -f istio-1.2.5/install/kubernetes/istio-demo.yaml;
+
+k-istio-1.3.1-setup:
+	for i in istio-1.3.1/install/kubernetes/helm/istio-init/files/crd*yaml; do kubectl apply -f $$i; done; \
+	kubectl apply -f istio-1.3.1/install/kubernetes/istio-demo.yaml;
 
 k-expose-telemetry:
 	kubectl apply -f istio-1.2.5/install/kubernetes/grafana-ingress.yaml; \
