@@ -285,6 +285,11 @@ k-deploy-transportadora: k-build-transportadora
 #	kubectl apply -f kubernetes/transportadora/ingress.yaml
 #	kubectl apply -f kubernetes/transportadora/;
 
+k-update-transportadora: k-build-transportadora
+	kubectl delete -f kubernetes/transportadora/deployment.yaml; \
+	sleep 1; \
+	kubectl apply -f <(istioctl kube-inject -f kubernetes/transportadora/deployment.yaml)
+
 k-delete-transportadora:
 	kubectl delete -f kubernetes/transportadora/;
 
@@ -297,6 +302,11 @@ k-deploy-transportadora-v2: k-build-transportadora-v2
 #	kubectl apply -f kubernetes/transportadora-v2/gateway.yaml
 #	kubectl apply -f kubernetes/transportadora-v2/ingress.yaml
 #	kubectl apply -f kubernetes/transportadora-v2/;
+
+k-update-transportadora-v2: k-build-transportadora-v2
+	kubectl delete -f kubernetes/transportadora-v2/deployment.yaml; \
+	sleep 1; \
+	kubectl apply -f <(istioctl kube-inject -f kubernetes/transportadora-v2/deployment.yaml)
 
 k-delete-transportadora-v2:
 	kubectl delete -f kubernetes/transportadora-v2/;

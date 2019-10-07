@@ -17110,7 +17110,7 @@ spec:
         fsGroup: 472
       containers:
         - name: grafana
-          image: "grafana/grafana:6.1.6"
+          image: "grafana/grafana:latest"
           imagePullPolicy: IfNotPresent
           ports:
           - containerPort: 3000
@@ -17892,7 +17892,7 @@ spec:
       serviceAccountName: prometheus
       containers:
         - name: prometheus
-          image: "docker.io/prom/prometheus:v2.8.0"
+          image: "docker.io/prom/prometheus:latest"
           imagePullPolicy: IfNotPresent
           args:
             - '--storage.tsdb.retention=6h'
@@ -18204,7 +18204,7 @@ spec:
     spec:
       containers:
         - name: jaeger
-          image: "docker.io/jaegertracing/all-in-one:1.9"
+          image: "docker.io/jaegertracing/all-in-one:latest"
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 9411
