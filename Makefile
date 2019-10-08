@@ -398,3 +398,6 @@ k-routing-transportadora-random:
 
 k-delete-routing-random:
 	kubectl delete -f kubernetes/route/advanced/destination-rule-transportadora_lb_policy_app.yml;
+
+k-show-routing:
+	kubectl get virtualservice,destinationrule;
