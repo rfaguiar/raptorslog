@@ -3,7 +3,7 @@
 #WORKDIR /home/src
 #RUN gradle build
 
-FROM openjdk:12
+FROM openjdk:12-alpine
 #COPY --from=builder /home/src/build/libs/*.jar /app.jar
 COPY ./build/libs/*.jar  /app.jar
 EXPOSE 8071

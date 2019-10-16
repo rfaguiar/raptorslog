@@ -3,7 +3,7 @@
 #WORKDIR /home/src
 #RUN gradle build
 
-FROM openjdk:12
+FROM openjdk:12-alpine
 
 ENV JAEGER_SERVICE_NAME=loja \
   JAEGER_ENDPOINT=http://jaeger-collector.istio-system.svc:14268/api/traces \
