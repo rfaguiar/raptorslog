@@ -8,8 +8,6 @@ help:
 	echo "Use make [rule]"
 	echo "Rules:"
 	echo ""
-	echo "dockerr-rabbitmq       - This will start a RabbitMQ container listening on the default port of 5672. web-browser port 15672 and pluguins: rabbitmq_management rabbitmq_web_dispatch rabbitmq_management_agent"
-	echo ""
 	echo "k-start		         - start minikube machine"
 	echo "k-stop		         - stop minikube machine"
 
@@ -36,8 +34,8 @@ gradleb-transportadora-dispatcher:
 
 gradleb-all: gradleb-loja gradleb-entregador-RS gradleb-entregador-AM gradleb-entregador-MG gradleb-transportadora-receiver gradleb-transportadora-consumer gradleb-transportadora-dispatcher
 
-dockerb-rabbitmq:
-	docker build --force-rm -t rabbitmq:1.0.0 ./queue/;
+dockerb-queue:
+	docker build --force-rm -t queue:1.0.0 ./queue/;
 
 dockerb-entregador-RS: gradleb-entregador-RS
 	docker build --force-rm -t entregador-rs:1.0.0 ./entregador-RS/;
@@ -60,7 +58,7 @@ dockerb-transportadora-consumer: gradleb-transportadora-consumer
 dockerb-transportadora-dispatcher: gradleb-transportadora-dispatcher
 	docker build --force-rm -t transportadora-dispatcher:1.0.0 ./transportadora-dispatcher/;
 
-dockerb-all: dockerb-rabbitmq gradleb-loja dockerb-entregador-RS dockerb-entregador-AM dockerb-entregador-MG dockerb-transportadora-receiver gradleb-transportadora-consumer dockerb-transportadora-dispatcher
+dockerb-all: dockerb-queue gradleb-loja dockerb-entregador-RS dockerb-entregador-AM dockerb-entregador-MG dockerb-transportadora-receiver gradleb-transportadora-consumer dockerb-transportadora-dispatcher
 
 compose-build: compose-down gradleb-all
 	docker-compose build;
@@ -100,41 +98,30 @@ health:
 test-raptorslog:
 	while true; do sleep 1; curl -X POST http://localhost:8080/v1/pedido; echo -e '\n';done
 
-rabbitmqrun: dockerb-rabbitmq
-	docker run -d --network minha-rede --hostname rabbitmq --name rabbitmq -p 15672:15672 -p 5671-5672:5671-5672 rabbitmq:1.0.0
+queuemqrun: dockerb-queue
+	docker run -d --network minha-rede --hostname queue --name queue -p 6379:6379 queue:1.0.0
 
 lojarun: dockerb-loja
 	docker run -d --network minha-rede --name loja \
-	-e ENV_RABBITMQ_HOST=rabbitmq \
-	-e ENV_RABBITMQ_PORT=5672 \
-	-e ENV_RABBITMQ_USER=guest \
-	-e ENV_RABBITMQ_PASS=guest \
-	-e ENV_QUEUE_NAME=raptorslog.queue \
-	-e ENV_QUEUE_EXCHANGE=raptorslog.exchange \
-	-e ENV_QUEUE_ROUTE_KEY=raptorslog.routingkey \
-	--link rabbitmq:rabbitmq \
+	-e REDIS_HOST=queue \
+	-e REDIS_PORT=6379 \
+	--link queue:queue \
 	-p 8080:8090 loja:1.0.0;
 
 transportadora-receiverrun: dockerb-transportadora-receiver
 	docker run -d --network minha-rede --name transportadora-receiver \
-	-e ENV_RABBITMQ_HOST=rabbitmq \
-	-e ENV_RABBITMQ_PORT=5672 \
-	-e ENV_RABBITMQ_USER=guest \
-	-e ENV_RABBITMQ_PASS=guest \
-	-e ENV_QUEUE_NAME=raptorslog.queue \
-	--link rabbitmq:rabbitmq \
+	-e REDIS_PORT=queue \
+	-e ENV_RABBITMQ_PORT=6379 \
+	--link queue:queue \
 	-p 8081:8080 transportadora-receiver:1.0.0;
 
 transportadora-consumerrun: dockerb-transportadora-consumer
 	docker run -d --network minha-rede --name transportadora-consumer \
-	-e ENV_RABBITMQ_HOST=rabbitmq \
-	-e ENV_RABBITMQ_PORT=5672 \
-	-e ENV_RABBITMQ_USER=guest \
-	-e ENV_RABBITMQ_PASS=guest \
-	-e ENV_QUEUE_NAME=raptorslog.queue \
+	-e REDIS_HOST=queue \
+	-e REDIS_PORT=6379 \
 	-e ENV_TRANSPORTADORA_DISPATCHER=http://transportadora-dispatcher:8083 \
 	--link transportadora-dispatcher:transportadora-dispatcher \
-	--link rabbitmq:rabbitmq \
+	--link queue:queue \
 	-p 8081:8080 transportadora-consumer:1.0.0;
 
 transportadora-dispatcherrun: dockerb-transportadora-dispatcher
@@ -142,7 +129,7 @@ transportadora-dispatcherrun: dockerb-transportadora-dispatcher
 	-e ENV_ENTREGADOR_RS=http://entregador:8070 \
 	-e ENV_ENTREGADOR_AM=http://entregador:8071 \
 	-e ENV_ENTREGADOR_MG=http://entregador:8072 \
-	--link rabbitmq:rabbitmq \
+	--link queue:queue \
 	--link entregador-rs:entregador-rs \
 	--link entregador-am:entregador-am \
 	--link entregador-mg:entregador-mg \
@@ -160,8 +147,8 @@ entregador-MGrun: dockerb-entregador-MG
 	docker run -d --network minha-rede --name entregador-mg \
 	-p 8085:8072 entregador-mg:1.0.0;
 
-rabbitmq-delete:
-	docker container rm -f rabbitmq;
+queuemq-delete:
+	docker container rm -f queue;
 
 loja-delete:
 	docker container rm -f loja;
@@ -184,7 +171,7 @@ entregador-AM-delete:
 entregador-MG-delete:
 	docker container rm -f entregador-mg;
 
-dockerrmall: rabbitmq-delete loja-delete transportadora-receiver-delete transportadora-consumer-delete transportadora-dispatcher-delete entregador-RS-delete entregador-AM-delete entregador-MG-delete
+dockerrmall: queuemq-delete loja-delete transportadora-receiver-delete transportadora-consumer-delete transportadora-dispatcher-delete entregador-RS-delete entregador-AM-delete entregador-MG-delete
 
 # export ISTIO_HOME=`pwd`/istio-1.2.5
 # export PATH=$ISTIO_HOME/bin:$PATH
@@ -229,21 +216,21 @@ k-getall:
 	kubectl -n raptorslog get deploy,rc,rs,pod,svc,ing;
 
 k-build-queue:
-	eval $$(minikube -p minikube docker-env) && docker build --force-rm -t rabbitmq:1.0.0 ./queue/;
+	eval $$(minikube -p minikube docker-env) && docker build --force-rm -t queue:1.0.0 ./queue/;
 
 k-deploy-queue: k-build-queue
 	kubectl apply -f kubernetes/queue/policy-istio.yaml
-	kubectl apply -f <(istioctl kube-inject -f kubernetes/queue/rabbitmq-deployment.yaml)
-	kubectl apply -f kubernetes/queue/rabbitmq-service.yaml
-	kubectl apply -f kubernetes/queue/rabbitmq-ingress.yaml
+	kubectl apply -f <(istioctl kube-inject -f kubernetes/queue/queue-deployment.yaml)
+	kubectl apply -f kubernetes/queue/queue-service.yaml
+	kubectl apply -f kubernetes/queue/queue-ingress.yaml
 	sleep 20; \
 #	kubectl apply -f kubernetes/queue/;
 
 k-delete-queue:
 	kubectl delete -f kubernetes/queue/;
 
-k-foward-queue:
-	kubectl port-forward -n=raptorslog rabbitmq-97c6d77bb-q8m7p 15672:15672;
+#k-foward-queue:
+#	kubectl port-forward -n=raptorslog queuemq-97c6d77bb-q8m7p 15672:15672;
 
 k-build-entregador-RS: gradleb-entregador-RS
 	eval $$(minikube -p minikube docker-env) && docker build --force-rm -t entregador-rs:1.0.0 ./entregador-RS/;

@@ -25,11 +25,9 @@ ext {
 
 dependencies {
 	compile group: 'io.micrometer', name: 'micrometer-registry-prometheus'
-	compile group: 'io.opentracing.contrib', name: 'opentracing-spring-rabbitmq-starter', version: '2.0.5'
-//	compile group: 'io.opentracing.contrib', name: 'opentracing-spring-jaeger-cloud-starter', version: '0.2.0'
 
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
-	implementation 'org.springframework.boot:spring-boot-starter-amqp'
+	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 }
