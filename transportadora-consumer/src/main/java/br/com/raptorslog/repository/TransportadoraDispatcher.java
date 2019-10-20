@@ -1,8 +1,9 @@
 package br.com.raptorslog.repository;
 
-//@FeignClient(name = "transportadora-dispatcher", url = "${client.transportadora-dispatcher.url}")
+import br.com.raptorslog.model.Encomenda;
+import org.springframework.http.ResponseEntity;
+
 public interface TransportadoraDispatcher {
 
-//    @PostMapping(value = "/v1/encomenda")
-//    ResponseEntity send(Encomenda encomenda);
+    ResponseEntity send(Encomenda encomenda);
 }

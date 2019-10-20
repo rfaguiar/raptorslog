@@ -2,10 +2,9 @@ package br.com.raptorslog.service;
 
 import br.com.raptorslog.model.Encomenda;
 import br.com.raptorslog.model.Entrega;
-import br.com.raptorslog.model.Message;
-import br.com.raptorslog.repository.EntregadorRS;
 import br.com.raptorslog.repository.EntregadorAM;
 import br.com.raptorslog.repository.EntregadorMG;
+import br.com.raptorslog.repository.EntregadorRS;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,13 +28,13 @@ public class EncomendaService {
         this.entregadorMG = entregadorMG;
     }
 
-    public Message send(Encomenda encomenda) {
+    public ResponseEntity send(Encomenda encomenda) {
         ResponseEntity send = sendToState(encomenda);
-        LOGGER.info("Dispatched: {}\n{}\n{}",
+        LOGGER.info("Dispatched: {}\t{}\t{}",
                 send.getBody(),
                 send.getStatusCodeValue(),
                 send.getHeaders().entrySet());
-        return new Message("Encomenda {0} sent to the Dispatcher Successfully".replace("{0}", encomenda.getId()));
+        return send;
     }
 
     private ResponseEntity sendToState(Encomenda encomenda) {

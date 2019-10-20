@@ -24,10 +24,11 @@ ext {
 }
 
 dependencies {
-	compile group: 'io.micrometer', name: 'micrometer-registry-prometheus'
+	compile 'io.micrometer:micrometer-registry-prometheus:latest.release'
+	compile group: 'io.jaegertracing', name: 'jaeger-core', version: '1.0.0'
+	compile group: 'io.opentracing.contrib', name: 'opentracing-spring-cloud-starter', version: '0.3.7'
 
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
-	implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 }

@@ -3,6 +3,7 @@ package br.com.raptorslog.controller;
 import br.com.raptorslog.model.Encomenda;
 import br.com.raptorslog.service.PedidoService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -15,16 +16,20 @@ import org.springframework.web.bind.annotation.RestController;
 public class PedidoController {
 
     private PedidoService pedidoService;
+    private String applicationName;
 
     @Autowired
-    public PedidoController(PedidoService pedidoService) {
+    public PedidoController(PedidoService pedidoService,
+                            @Value("${spring.application.name}") String applicationName) {
         this.pedidoService = pedidoService;
+        this.applicationName = applicationName;
     }
 
     @PostMapping
     public ResponseEntity producer(@RequestBody Encomenda encomenda) {
+        String resp = pedidoService.create(encomenda);
         return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(pedidoService.create(encomenda));
+                .status(HttpStatus.OK)
+                .body(String.format("%s v1 => %s", applicationName, resp));
     }
 }
